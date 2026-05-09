@@ -1,94 +1,67 @@
 # Makefile conventions
 
-This is the team-wide standard for `Makefile`s in repos we maintain. The Makefile is the canonical contributor interface; `make help` is the exhaustive target catalog. Reach for direct commands (`go`, `golangci-lint`) only when targeting a specific component or debugging.
+This document describes how we structure **`Makefile`**s in repositories we maintain. The Makefile is the main contributor interface; **`make help`** is the catalog of supported targets. Use ad hoc **`go`**, **`docker`**, or other commands only when you are debugging a specific step.
 
-The standard is portable — copy this doc and the guard script into a new project to enforce it.
+When you write or edit **repository documentation**, prefer stable behavior (how to run, configure, cache, override, and clean) over transient details (exact log lines, one-off toolchain warnings, or internal flags) unless those details are part of an intentional public contract.
 
-## Skeleton
+## This repository
 
-```make
-.PHONY: \
-    help \
-    install \
-    build test lint typecheck coverage ci \
-    build-app test-app run-app deploy-app clean
+**edgeos-adblock** uses a **Docker-only** Makefile: Go runs inside **`Dockerfile.dev`**, and the host needs Docker and make only. Public **`##@` headers** are intentionally minimal:
 
-.DEFAULT_GOAL := help
+1. **Setup** — dev image and convention checks  
+2. **Build** — cross-compile and **`.deb`** packaging  
+3. **Test** — **`go test`** in the dev image  
+4. **Clean** — remove **`dist/`**, packages, and common test outputs  
 
-help: ## Show this target catalog.
-	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n"} /^##@/ { printf "\n%s\n", substr($$0, 5) } /^[A-Za-z0-9_.-]+:.*##/ { printf "  %-38s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+**`scripts/check-makefile-conventions.sh`** asserts **`.DEFAULT_GOAL := help`** and that those four headers appear in that order. Run **`make guard-makefile`** before you push Makefile changes.
 
-##@ Setup
-install: ## Install project dependencies.
-	...
+For what each target does, which variables you can set, and where artifacts go, see **[build-and-test.md](build-and-test.md)** and **`make help`**.
 
-##@ Build
-build: ## Build all workspaces / packages.
-	...
+## Full standard (other repositories)
 
-##@ Test
-test: ## Run baseline tests.
-	...
+Larger projects may use more **`##@` categories** in this fixed order:
 
-##@ Run
-run-app: ## Start the app locally.
-	...
+1. **Setup** — install, sync, bootstrap  
+2. **Build** — compile and generated artifacts (**`build-*`**)  
+3. **Quality** — lint, format-check, typecheck (**`lint-*`**, **`format-*`**, …)  
+4. **Test** — unit and integration lanes (**`test-*`**)  
+5. **Coverage** — coverage gates (**`coverage-*`**)  
+6. **CI** — aggregates for pipelines (**`ci`**, **`ci-*`**)  
+7. **Run** — local dev servers (**`run-*`**)  
+8. **Refresh** — data or API refresh (**`refresh-*`**)  
+9. **Deploy** — production or infra (**`deploy-*`**)  
+10. **Clean** — destructive local cleanup (**`clean-*`**)
 
-##@ Deploy
-deploy-app: ## Deploy the app.
-	...
+If a category has nothing to do yet, keep a placeholder target so the guard script and **`make help`** stay consistent.
 
-##@ Clean
-clean: ## Remove local generated artefacts.
-	...
-```
-
-## Categories (canonical order)
-
-`##@` headers must appear in this order. The guard script enforces it.
-
-1. **Setup** — install / sync / bootstrap / link binaries
-2. **Build** — compile, generate, rebuild artefacts (`build-*`)
-3. **Quality** — lint / format-check / typecheck / validate-schemas (`lint-*`, `format-*`, `typecheck-*`, `validate-*`)
-4. **Test** — unit, integration, E2E, component lanes (`test-*`)
-5. **Coverage** — coverage gates (`coverage-*`)
-6. **CI** — `ci` and `ci-*` aggregate gates suitable for pre-push or pipeline use
-7. **Run** — local execution / dev servers (`run-*`)
-8. **Refresh** — external data / API refresh workflows (`refresh-*`)
-9. **Deploy** — infrastructure or production-affecting deployments (`deploy-*`)
-10. **Clean** — local destructive cleanup (`clean-*`)
-
-If a project has nothing to do in a category, include it anyway with at least one placeholder target — the guard asserts the full ordered list.
-
-## Naming
+### Naming
 
 | Prefix | Use for |
 | --- | --- |
-| `build-*` | compile, generate, rebuild artefacts |
-| `test-*` | unit, integration, E2E, component-specific tests |
-| `run-*` | local execution / dev servers |
-| `refresh-*` | external data / API refresh workflows |
-| `deploy-*` | infrastructure or production-affecting deployments |
-| `coverage-*` | coverage gates |
-| `lint-*`, `format-*`, `typecheck-*`, `validate-*`, `ci-*` | quality lanes |
-| `clean-*` | local destructive cleanup |
+| **`build-*`** | Compile, generate, rebuild artifacts |
+| **`test-*`** | Tests |
+| **`run-*`** | Local execution |
+| **`refresh-*`** | External data refresh |
+| **`deploy-*`** | Deployments |
+| **`coverage-*`** | Coverage gates |
+| **`lint-*`**, **`format-*`**, **`typecheck-*`**, **`validate-*`**, **`ci-*`** | Quality and CI |
+| **`clean-*`** | Local cleanup |
 
-## Documentation rules
+### Documentation rules for Makefiles
 
-- Every public `.PHONY` target has inline `## help text` after the recipe colon. If it's not in `make help`, it's effectively a private target — make it private (don't list in `.PHONY`).
-- Group public targets under `##@ Category` headers in the canonical order above.
-- Keep target descriptions short, imperative, and explicit about side effects.
-- Repo docs explain workflows; they don't duplicate the full target catalog.
-- Point contributors to `make help` for the complete list.
+- Every public **`.PHONY`** target has **`##` help text** after the recipe colon. If it is not in **`make help`**, treat it as private (omit from **`.PHONY`** or document that it is internal).  
+- Group public targets under **`##@ Category`** headers in the canonical order for that repo.  
+- Keep descriptions short, imperative, and explicit about important side effects (writes **`dist/`**, starts containers, etc.).  
+- Do not duplicate the full target list in prose; point readers to **`make help`**.
 
-## Guard
+## Guard script
 
-`scripts/check-makefile-conventions.sh` validates `.DEFAULT_GOAL := help` and the ordered `##@` headers expected for that repository. In **edgeos-adblock** the guard expects **Setup → Build → Test → Clean** (Docker-only slim Makefile). Run **`make guard-makefile`**.
+Copy **`scripts/check-makefile-conventions.sh`** into a new project and adjust the **`expected=(...)`** array to match the **`##@` headers** you use. Run it from **`make guard-makefile`** or CI.
 
-## Quick adoption checklist
+## Adoption checklist
 
-1. Copy `scripts/check-makefile-conventions.sh` (or adapt category list inside it).
-2. Rewrite the `Makefile` per the skeleton and categories above (or your chosen subset, and align the guard script).
-3. Run the guard; iterate until green.
-4. Invoke your CI entrypoint (`make test`, `make ci`, etc.) from your runner or hooks.
-5. Reference this doc from the project's contributor docs.
+1. Copy or adapt **`scripts/check-makefile-conventions.sh`**.  
+2. Add **`help`** as the default goal and ordered **`##@`** sections.  
+3. Run the guard until it passes.  
+4. Wire **`make test`** (or **`make ci`**) into your CI or pre-push workflow.  
+5. Link this doc from the project README for contributors.

@@ -1,32 +1,36 @@
 # edgeos-adblock
 
-`update-dnsmasq` is a CLI for Ubiquiti **EdgeOS / EdgeRouter** routers. It reads **`service dns forwarding blocklist`** configuration (Vyatta-style), downloads configured URL and file sources, normalizes host and domain lists, writes **dnsmasq** fragments (default **`/etc/dnsmasq.d`** on device, overridable with **`-dir`**), and reloads **dnsmasq** where the stock init layout exists.
+`update-dnsmasq` is a small CLI for Ubiquiti **EdgeOS / EdgeRouter** systems. It reads **`service dns forwarding blocklist`** (Vyatta-style configuration), downloads the URL and file sources you configure, normalizes host and domain lists, writes **dnsmasq** include fragments (default **`/etc/dnsmasq.d`**, override with **`-dir`**), and reloads **dnsmasq** when the stock init script layout is present.
 
-The repo includes **Vyatta templates** under **`.payload/`** for the blocklist configuration tree, plus install/remove helpers used with the Debian package.
+The repository ships **Vyatta templates** under **`.payload/`** for that configuration tree, plus Debian packaging and install/remove helpers.
 
-## What it does
+## Behavior on the router
 
-- Loads blocklist configuration from EdgeOS **`config.boot`**-style data (or **`-f`**).
-- Processes **domains** and **hosts** trees with EdgeOS semantics: per-source and global **exclude** / **include**, DNS redirect IP, disabled sources, and enable/disable.
-- Fetches remote lists over HTTPS and strips per-source prefixes when configured.
-- Writes dnsmasq include files and reloads dnsmasq after updates on a live router.
-- Optional **`-safe`** loads **`/config/user-data/edgeos-adblock.failover.cfg`** when the primary config is unavailable.
+- Reads blocklist configuration from EdgeOS-style data (live **`config.boot`** path or **`-f`**).
+- Applies **domains** and **hosts** semantics: per-source and global **exclude** / **include**, DNS redirect IP, disabled sources, and enable/disable.
+- Fetches remote lists over HTTPS and applies per-source prefix stripping when configured.
+- Writes dnsmasq include files and reloads dnsmasq after a successful update.
+- Optional **`-safe`** reads **`/config/user-data/edgeos-adblock.failover.cfg`** when the primary configuration is not available.
 
-## How blocklists are supplied
+Run **`update-dnsmasq -h`** on a device or build for the current flag list. Common options: **`-f`** (config), **`-dir`** (output directory), **`-v`** (verbose), **`-safe`** (failover config).
 
-Subscriptions are normal HTTP(S) URLs (and optional local files) declared under **`hosts`** and **`domains`** in the EdgeOS blocklist tree. This project does not ship a curated domain blocklist in-tree; you point sources at community lists and tune with EdgeOS excludes/includes.
+## Sources and examples
 
-Shipped examples and the **`Live`** test fixture use **[HaGeZi DNS Blocklists](https://github.com/hagezi/dns-blocklists)** in **dnsmasq** format—the **[Pro list](https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt)** delivered via **[jsDelivr](https://cdn.jsdelivr.net)**. See **[HaGeZi’s repository](https://github.com/hagezi/dns-blocklists)** for formats, tiers, and changelog. In those snippets the hosts URL source is named **`hageziPro`** (Vyatta source tag).
+Blocklists are ordinary HTTP(S) URLs (and optional local files) under **`hosts`** and **`domains`** in the blocklist tree. On first install, **`post-install.sh`** (from the **`.deb`**) seeds a single default URL source, **HaGeZi Pro** (**`hageziPro`**), so the service is usable immediately; add or change sources and tuning under **`configure`** as you like.
 
-## CLI
+Example snippets and the **`Live`** test fixture use the same **[HaGeZi DNS Blocklists](https://github.com/hagezi/dns-blocklists)** entry in dnsmasq form (**[Pro list](https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt)** via **[jsDelivr](https://cdn.jsdelivr.net)**). See HaGeZi’s repository for formats and tiers.
 
-Run **`update-dnsmasq -h`** for current flags. Common options: **`-f`** (config), **`-dir`** (dnsmasq output directory), **`-v`** (verbose), **`-safe`** (failover config).
+## Developing and packaging
 
-## Build and install
+Contributors need **Docker** and **GNU make** only; Go runs inside the dev image. **`make help`** lists every target.
 
-- **Develop and build from source:** **[docs/build-and-test.md](docs/build-and-test.md)** (`make help`, **`make test`**, **`make build`**, **`make pkgs`** in Docker; **`docker build`** for the slim runtime image).
-- **Package layout:** the CLI lives under **`cmd/update-dnsmasq/`**; shared libraries under **`internal/`**. Debian packaging helpers include **`make_deb`** and **`Dockerfile`** as documented there.
-- **Router install:** use your usual packaging or artifact workflow; **`.payload/post-install.sh`** illustrates CLI commands that provision blocklist sources and a periodic **`update-dnsmasq`** task. **`config.gateway.json`** is a UniFi **`config.gateway.json`** example for USG-style provisioning.
+End-to-end workflow, artifact locations, cache behavior, and supported **make** variables are described in **[docs/build-and-test.md](docs/build-and-test.md)**.
+
+Layout: **`cmd/update-dnsmasq/`** (CLI entrypoint), **`internal/`** (libraries), **`.payload/`** (templates and maintainer scripts), **`make_deb`** and **`Dockerfile`** / **`Dockerfile.dev`** (packaging and images).
+
+## Installing on hardware
+
+Install the **`.deb`** built for your router’s CPU architecture (**mips** vs **mipsel**). The package places **`update-dnsmasq`** under **`/config/scripts/`**, installs Vyatta templates, and on first install runs **`.payload/post-install.sh`** inside a Vyatta **`configure`** session to enable **`service dns forwarding blocklist`** with the default **HaGeZi Pro** hosts source and the **`update_edgeos_adblock`** periodic task.
 
 ## License
 
