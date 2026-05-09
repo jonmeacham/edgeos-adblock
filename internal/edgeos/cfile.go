@@ -13,7 +13,7 @@ type CFile struct {
 	Names []string
 }
 
-// readDir returns a listing of dnsmasq blacklist configuration files
+// readDir returns a listing of dnsmasq blocklist configuration files
 func (c *CFile) readDir(pattern string) ([]string, error) {
 	f, err := filepath.Glob(pattern)
 	c.Debug(fmt.Sprintf("Files: %v\n: %v", pattern, f))

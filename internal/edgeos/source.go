@@ -50,7 +50,7 @@ func (s *source) area() string {
 	return hosts
 }
 
-// excludes returns an io.Reader of blacklist includes
+// excludes returns an io.Reader of blocklist includes
 func (s *source) excludes() io.Reader {
 	sort.Strings(s.exc)
 	return strings.NewReader(strings.Join(s.exc, "\n"))
@@ -68,7 +68,7 @@ func (s *source) filename(area string) string {
 	return fmt.Sprintf(s.FnFmt, s.Dir, area, s.name, s.Ext)
 }
 
-// includes returns an io.Reader of blacklist includes
+// includes returns an io.Reader of blocklist includes
 func (s *source) includes() io.Reader {
 	sort.Strings(s.inc)
 	return strings.NewReader(strings.Join(s.inc, "\n"))
@@ -230,8 +230,8 @@ func (s *source) String() string {
 			fmt.Sprintf("%s%q\n", pad("Prefix:"), a(s.prefix)),
 			fmt.Sprintf("%s%q\n", pad("Type:"), getType(s.nType)),
 			fmt.Sprintf("%s%q\n", pad("URL:"), a(s.url)),
-			fmt.Sprintf("Whitelist:\n%s", printArray(s.exc)),
-			fmt.Sprintf("Blacklist:\n%s", printArray(s.inc)),
+			fmt.Sprintf("Allowlist:\n%s", printArray(s.exc)),
+			fmt.Sprintf("Blocklist:\n%s", printArray(s.inc)),
 		},
 		"",
 	)

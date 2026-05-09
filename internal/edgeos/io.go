@@ -95,7 +95,7 @@ func GetFile(f string) (io.Reader, error) {
 	return os.Open(f)
 }
 
-// purgeFiles removes any orphaned blacklist files that don't have sources
+// purgeFiles removes any orphaned blocklist files that don't have sources
 func purgeFiles(files []string) error {
 	var errs []string
 	for _, f := range files {

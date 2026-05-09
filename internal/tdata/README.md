@@ -8,8 +8,8 @@ Strings below mirror `tdata.go`. Example hosts subscriptions use **[HaGeZi DNS B
 
 ```go
 var (
-	// Cfg contains a valid full EdgeOS blacklist configuration
-	Cfg = `blacklist {
+	// Cfg contains a valid full EdgeOS blocklist configuration
+	Cfg = `blocklist {
     disabled false
     dns-redirect-ip 0.0.0.0
     domains {
@@ -120,7 +120,7 @@ var (
             file ../internal/testdata/blist.hosts.src
         }
         source volkerschatz {
-            description "Ad server blacklists"
+            description "Ad server blocklists"
             prefix http
             url http://www.volkerschatz.com/net/adpaths
         }
@@ -137,8 +137,8 @@ var (
 	/* Release version: v1.8.5.4884695.160608.1057 */
 }`
 
-	// CfgPartial contains a valid partial EdgeOS blacklist configuration
-	CfgPartial = `blacklist {
+	// CfgPartial contains a valid partial EdgeOS blocklist configuration
+	CfgPartial = `blocklist {
     disabled false
     dns-redirect-ip 0.0.0.0
     domains {
@@ -203,8 +203,8 @@ var (
     }
 }`
 
-	// CfgMimimal contains a valid minimal EdgeOS blacklist configuration
-	CfgMimimal = `blacklist {
+	// CfgMimimal contains a valid minimal EdgeOS blocklist configuration
+	CfgMimimal = `blocklist {
     disabled false
     dns-redirect-ip 0.0.0.0
     domains {
@@ -233,7 +233,7 @@ var (
     }
 }`
 
-	// CfgDeleted has no EdgeOS blacklist configuration
+	// CfgDeleted has no EdgeOS blocklist configuration
 	CfgDeleted = `interfaces {
     ethernet eth0 {
         address dhcp
@@ -412,8 +412,8 @@ system {
 /* Release version: v1.10.0-beta.3.5051713.180109.1605 */
 `
 
-	// DisabledCfg contains a disabled valid EdgeOS blacklist configuration
-	DisabledCfg = `blacklist {
+	// DisabledCfg contains a disabled valid EdgeOS blocklist configuration
+	DisabledCfg = `blocklist {
         disabled true
         dns-redirect-ip 0.0.0.0
         domains {
@@ -524,7 +524,7 @@ system {
                 file ./internal/testdata/blist.hosts.src
             }
             source volkerschatz {
-                description "Ad server blacklists"
+                description "Ad server blocklists"
                 prefix http
                 url http://www.volkerschatz.com/net/adpaths
             }
@@ -541,8 +541,8 @@ system {
         /* Release version: v1.8.5.4884695.160608.1057 */
     }`
 
-	// ZeroHostSourcesCfg is a valid EdgeOS blacklist configuration with zero hosts sources
-	ZeroHostSourcesCfg = `blacklist {
+	// ZeroHostSourcesCfg is a valid EdgeOS blocklist configuration with zero hosts sources
+	ZeroHostSourcesCfg = `blocklist {
 	disabled false
 	dns-redirect-ip 0.0.0.0
 	domains {
@@ -609,13 +609,13 @@ system {
 	}
 }`
 
-	// NoBlacklist returns a VyOS error message
-	NoBlacklist = `Configuration under specified path is empty`
+	// NoBlocklist returns a VyOS error message
+	NoBlocklist = `Configuration under specified path is empty`
 
-	// JSONcfg is JSON formatted blacklist configuration output
+	// JSONcfg is JSON formatted blocklist configuration output
 	JSONcfg = `{
   "nodes": [{
-    "blacklist": {
+    "blocklist": {
       "disabled": "false",
       "ip": "0.0.0.0",
       "excludes": [
@@ -746,7 +746,7 @@ system {
         },
         "volkerschatz": {
           "disabled": "false",
-          "description": "Ad server blacklists",
+          "description": "Ad server blocklists",
           "prefix": "http",
           "url": "http://www.volkerschatz.com/net/adpaths",
         },
@@ -760,13 +760,13 @@ system {
   }]
 }`
 
-	// JSONrawcfg is JSON unformatted blacklist configuration output
-	JSONrawcfg = `{"blacklist":{"data":{},"disable":false,"excludes":["122.2o7.net","1e100.net","adobedtm.com","akamai.net","amazon.com","amazonaws.com","apple.com","ask.com","avast.com","bitdefender.com","cdn.visiblemeasures.com","cloudfront.net","coremetrics.com","edgesuite.net","freedns.afraid.org","github.com","githubusercontent.com","google.com","googleadservices.com","googleapis.com","googleusercontent.com","gstatic.com","gvt1.com","gvt1.net","hb.disney.go.com","hp.com","hulu.com","images-amazon.com","msdn.com","paypal.com","rackcdn.com","schema.org","skype.com","smacargo.com","sourceforge.net","ssl-on9.com","ssl-on9.net","static.chartbeat.com","storage.googleapis.com","windows.net","yimg.com","ytimg.com"],"includes":[],"ip":"0.0.0.0"},"domains":{"data":{"malc0de":{"desc":"List of zones serving malicious executables observed by malc0de.com/database/","disabled":false,"file":"","ip":"","name":"malc0de","prefix":"zone ","type":2,"url":"http://malc0de.com/bl/ZONES"}},"disable":false,"excludes":[],"includes":["adsrvr.org","adtechus.net","advertising.com","centade.com","doubleclick.net","free-counter.co.uk","intellitxt.com","kiosked.com"],"ip":"0.0.0.0"},"hosts":{"data":{"adaway":{"desc":"Blocking mobile ad providers and some analytics providers","disabled":false,"file":"","ip":"","name":"adaway","prefix":"127.0.0.1 ","type":3,"url":"http://adaway.org/hosts.txt"},"malwaredomainlist":{"desc":"127.0.0.1 based host and domain list","disabled":false,"file":"","ip":"","name":"malwaredomainlist","prefix":"127.0.0.1 ","type":3,"url":"http://www.malwaredomainlist.com/hostslist/hosts.txt"},"openphish":{"desc":"OpenPhish automatic phishing detection","disabled":false,"file":"","ip":"","name":"openphish","prefix":"http","type":3,"url":"https://openphish.com/feed.txt"},"someonewhocares":{"desc":"Zero based host and domain list","disabled":false,"file":"","ip":"","name":"someonewhocares","prefix":"0.0.0.0","type":3,"url":"http://someonewhocares.org/hosts/zero/"},"tasty":{"desc":"File source","disabled":false,"file":"../internal/testdata/blist.hosts.src","ip":"0.0.0.0","name":"tasty","prefix":"","type":3,"url":""},"volkerschatz":{"desc":"Ad server blacklists","disabled":false,"file":"","ip":"","name":"volkerschatz","prefix":"http","type":3,"url":"http://www.volkerschatz.com/net/adpaths"},"winhelp2002":{"desc":"Zero based host and domain list","disabled":false,"file":"","ip":"0.0.0.0","name":"winhelp2002","prefix":"0.0.0.0 ","type":3,"url":"http://winhelp2002.mvps.org/hosts.txt"},"yoyo":{"desc":"Fully Qualified Domain Names only - no prefix to strip","disabled":false,"file":"","ip":"","name":"yoyo","prefix":"","type":3,"url":"http://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml\u0026showintro=1\u0026mimetype=plaintext"}},"disable":false,"excludes":[],"includes":["beap.gemini.yahoo.com"],"ip":"192.168.168.1"}}`
+	// JSONrawcfg is JSON unformatted blocklist configuration output
+	JSONrawcfg = `{"blocklist":{"data":{},"disable":false,"excludes":["122.2o7.net","1e100.net","adobedtm.com","akamai.net","amazon.com","amazonaws.com","apple.com","ask.com","avast.com","bitdefender.com","cdn.visiblemeasures.com","cloudfront.net","coremetrics.com","edgesuite.net","freedns.afraid.org","github.com","githubusercontent.com","google.com","googleadservices.com","googleapis.com","googleusercontent.com","gstatic.com","gvt1.com","gvt1.net","hb.disney.go.com","hp.com","hulu.com","images-amazon.com","msdn.com","paypal.com","rackcdn.com","schema.org","skype.com","smacargo.com","sourceforge.net","ssl-on9.com","ssl-on9.net","static.chartbeat.com","storage.googleapis.com","windows.net","yimg.com","ytimg.com"],"includes":[],"ip":"0.0.0.0"},"domains":{"data":{"malc0de":{"desc":"List of zones serving malicious executables observed by malc0de.com/database/","disabled":false,"file":"","ip":"","name":"malc0de","prefix":"zone ","type":2,"url":"http://malc0de.com/bl/ZONES"}},"disable":false,"excludes":[],"includes":["adsrvr.org","adtechus.net","advertising.com","centade.com","doubleclick.net","free-counter.co.uk","intellitxt.com","kiosked.com"],"ip":"0.0.0.0"},"hosts":{"data":{"adaway":{"desc":"Blocking mobile ad providers and some analytics providers","disabled":false,"file":"","ip":"","name":"adaway","prefix":"127.0.0.1 ","type":3,"url":"http://adaway.org/hosts.txt"},"malwaredomainlist":{"desc":"127.0.0.1 based host and domain list","disabled":false,"file":"","ip":"","name":"malwaredomainlist","prefix":"127.0.0.1 ","type":3,"url":"http://www.malwaredomainlist.com/hostslist/hosts.txt"},"openphish":{"desc":"OpenPhish automatic phishing detection","disabled":false,"file":"","ip":"","name":"openphish","prefix":"http","type":3,"url":"https://openphish.com/feed.txt"},"someonewhocares":{"desc":"Zero based host and domain list","disabled":false,"file":"","ip":"","name":"someonewhocares","prefix":"0.0.0.0","type":3,"url":"http://someonewhocares.org/hosts/zero/"},"tasty":{"desc":"File source","disabled":false,"file":"../internal/testdata/blist.hosts.src","ip":"0.0.0.0","name":"tasty","prefix":"","type":3,"url":""},"volkerschatz":{"desc":"Ad server blocklists","disabled":false,"file":"","ip":"","name":"volkerschatz","prefix":"http","type":3,"url":"http://www.volkerschatz.com/net/adpaths"},"winhelp2002":{"desc":"Zero based host and domain list","disabled":false,"file":"","ip":"0.0.0.0","name":"winhelp2002","prefix":"0.0.0.0 ","type":3,"url":"http://winhelp2002.mvps.org/hosts.txt"},"yoyo":{"desc":"Fully Qualified Domain Names only - no prefix to strip","disabled":false,"file":"","ip":"","name":"yoyo","prefix":"","type":3,"url":"http://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml\u0026showintro=1\u0026mimetype=plaintext"}},"disable":false,"excludes":[],"includes":["beap.gemini.yahoo.com"],"ip":"192.168.168.1"}}`
 
-	// JSONcfgZeroHostSources is JSON formatted blacklist configuration output with zero sources for hosts
+	// JSONcfgZeroHostSources is JSON formatted blocklist configuration output with zero sources for hosts
 	JSONcfgZeroHostSources = `{
   "nodes": [{
-    "blacklist": {
+    "blocklist": {
       "disabled": "false",
       "ip": "0.0.0.0",
       "excludes": [
@@ -846,52 +846,52 @@ system {
     }
   }]
 }`
-	// FileManifest is complete list of the blacklist config node templates
-	FileManifest = `../payload/blacklist
-../payload/blacklist/disabled
-../payload/blacklist/disabled/node.def
-../payload/blacklist/dns-redirect-ip
-../payload/blacklist/dns-redirect-ip/node.def
-../payload/blacklist/domains
-../payload/blacklist/domains/dns-redirect-ip
-../payload/blacklist/domains/dns-redirect-ip/node.def
-../payload/blacklist/domains/exclude
-../payload/blacklist/domains/exclude/node.def
-../payload/blacklist/domains/include
-../payload/blacklist/domains/include/node.def
-../payload/blacklist/domains/node.def
-../payload/blacklist/domains/source
-../payload/blacklist/domains/source/node.def
-../payload/blacklist/domains/source/node.tag
-../payload/blacklist/domains/source/node.tag/description
-../payload/blacklist/domains/source/node.tag/description/node.def
-../payload/blacklist/domains/source/node.tag/prefix
-../payload/blacklist/domains/source/node.tag/prefix/node.def
-../payload/blacklist/domains/source/node.tag/url
-../payload/blacklist/domains/source/node.tag/url/node.def
-../payload/blacklist/exclude
-../payload/blacklist/exclude/node.def
-../payload/blacklist/hosts
-../payload/blacklist/hosts/dns-redirect-ip
-../payload/blacklist/hosts/dns-redirect-ip/node.def
-../payload/blacklist/hosts/exclude
-../payload/blacklist/hosts/exclude/node.def
-../payload/blacklist/hosts/include
-../payload/blacklist/hosts/include/node.def
-../payload/blacklist/hosts/node.def
-../payload/blacklist/hosts/source
-../payload/blacklist/hosts/source/node.def
-../payload/blacklist/hosts/source/node.tag
-../payload/blacklist/hosts/source/node.tag/description
-../payload/blacklist/hosts/source/node.tag/description/node.def
-../payload/blacklist/hosts/source/node.tag/prefix
-../payload/blacklist/hosts/source/node.tag/prefix/node.def
-../payload/blacklist/hosts/source/node.tag/url
-../payload/blacklist/hosts/source/node.tag/url/node.def
-../payload/blacklist/node.def
+	// FileManifest is complete list of the blocklist config node templates
+	FileManifest = `../payload/blocklist
+../payload/blocklist/disabled
+../payload/blocklist/disabled/node.def
+../payload/blocklist/dns-redirect-ip
+../payload/blocklist/dns-redirect-ip/node.def
+../payload/blocklist/domains
+../payload/blocklist/domains/dns-redirect-ip
+../payload/blocklist/domains/dns-redirect-ip/node.def
+../payload/blocklist/domains/exclude
+../payload/blocklist/domains/exclude/node.def
+../payload/blocklist/domains/include
+../payload/blocklist/domains/include/node.def
+../payload/blocklist/domains/node.def
+../payload/blocklist/domains/source
+../payload/blocklist/domains/source/node.def
+../payload/blocklist/domains/source/node.tag
+../payload/blocklist/domains/source/node.tag/description
+../payload/blocklist/domains/source/node.tag/description/node.def
+../payload/blocklist/domains/source/node.tag/prefix
+../payload/blocklist/domains/source/node.tag/prefix/node.def
+../payload/blocklist/domains/source/node.tag/url
+../payload/blocklist/domains/source/node.tag/url/node.def
+../payload/blocklist/exclude
+../payload/blocklist/exclude/node.def
+../payload/blocklist/hosts
+../payload/blocklist/hosts/dns-redirect-ip
+../payload/blocklist/hosts/dns-redirect-ip/node.def
+../payload/blocklist/hosts/exclude
+../payload/blocklist/hosts/exclude/node.def
+../payload/blocklist/hosts/include
+../payload/blocklist/hosts/include/node.def
+../payload/blocklist/hosts/node.def
+../payload/blocklist/hosts/source
+../payload/blocklist/hosts/source/node.def
+../payload/blocklist/hosts/source/node.tag
+../payload/blocklist/hosts/source/node.tag/description
+../payload/blocklist/hosts/source/node.tag/description/node.def
+../payload/blocklist/hosts/source/node.tag/prefix
+../payload/blocklist/hosts/source/node.tag/prefix/node.def
+../payload/blocklist/hosts/source/node.tag/url
+../payload/blocklist/hosts/source/node.tag/url/node.def
+../payload/blocklist/node.def
 `
 	// Live is a working EdgeOS configuration
-	Live = `blacklist {
+	Live = `blocklist {
         disabled false
         dns-redirect-ip 192.168.168.1
         domains {
@@ -1047,7 +1047,7 @@ service {
     }
     dns {
         forwarding {
-            blacklist {
+            blocklist {
                 disabled false
                 dns-redirect-ip 0.0.0.0
                 hosts {

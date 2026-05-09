@@ -53,30 +53,30 @@ const (
 	notknown  = "unknown"
 	preNoun   = "pre-configured"
 	roots     = "roots"
-	rootNode  = "blacklist"
+	rootNode  = "blocklist"
 	src       = "source"
 	urls      = "url"
 
 	// ExcDomns is a string labels for domain exclusions
-	ExcDomns = "whitelisted-subdomains"
+	ExcDomns = "allowlisted-subdomains"
 	// ExcHosts is a string labels for host exclusions
-	ExcHosts = "whitelisted-servers"
+	ExcHosts = "allowlisted-servers"
 	// ExcRoots is a string labels for preconfigured global domain exclusions
-	ExcRoots = "global-whitelisted-domains"
-	// PreDomns is a string label for preconfigured whitelisted domains
-	PreDomns = "blacklisted-subdomains"
-	// PreHosts is a string label for preconfigured blacklisted hosts
-	PreHosts = "blacklisted-servers"
-	// PreRoots is a string label for preconfigured global blacklisted hosts
-	PreRoots = "global-blacklisted-domains"
+	ExcRoots = "global-allowlisted-domains"
+	// PreDomns is a string label for preconfigured blocklisted subdomains
+	PreDomns = "blocklisted-subdomains"
+	// PreHosts is a string label for preconfigured blocklisted hosts
+	PreHosts = "blocklisted-servers"
+	// PreRoots is a string label for preconfigured global blocklisted hosts
+	PreRoots = "global-blocklisted-domains"
 	// False is a string constant
 	False = "false"
 	// True is a string constant
 	True = "true"
 )
 
-// ErrNoBlacklistCfg is returned when no blacklist configuration tree was parsed.
-var ErrNoBlacklistCfg = errors.New("no EdgeOS dns forwarding blacklist configuration")
+// ErrNoBlocklistCfg is returned when no blocklist configuration tree was parsed.
+var ErrNoBlocklistCfg = errors.New("no EdgeOS dns forwarding blocklist configuration")
 
 func (c *Config) nodeExists(n string) bool {
 	_, ok := c.tree[n]
@@ -262,7 +262,7 @@ func (c *Config) Nodes() (n []string) {
 	return n
 }
 
-// isTnode returns true if node is a root or top node in the blacklist configuration
+// isTnode returns true if node is a root or top node in the blocklist configuration
 func isTnode(n string) bool {
 	switch n {
 	case rootNode, domains, hosts:
@@ -275,12 +275,12 @@ func (c *Config) excinc(t [][]byte, n string) {
 	switch string(t[1]) {
 	case "exclude":
 		if isTnode(n) {
-			c.Debug(fmt.Sprintf("Whitelisting %s on node %s", string(t[2]), n))
+			c.Debug(fmt.Sprintf("Allowlisting %s on node %s", string(t[2]), n))
 			c.tree[n].exc = append(c.tree[n].exc, string(t[2]))
 		}
 	case "include":
 		if isTnode(n) {
-			c.Debug(fmt.Sprintf("Blacklisting %s on node %s", string(t[2]), n))
+			c.Debug(fmt.Sprintf("Blocklisting %s on node %s", string(t[2]), n))
 			c.tree[n].inc = append(c.tree[n].inc, string(t[2]))
 		}
 	}
@@ -383,8 +383,8 @@ func (c *Config) ProcessContent(cts ...Contenter) error {
 	return nil
 }
 
-// Blacklist extracts blacklist nodes from a EdgeOS/VyOS configuration structure
-func (c *Config) Blacklist(r ConfLoader) error {
+// Blocklist extracts blocklist nodes from a EdgeOS/VyOS configuration structure
+func (c *Config) Blocklist(r ConfLoader) error {
 	var (
 		b     = bufio.NewScanner(r.read())
 		find  = regx.NewRegex()
@@ -411,7 +411,7 @@ func (c *Config) Blacklist(r ConfLoader) error {
 			nodes = append(nodes, string(srcName[1]))
 			o = newSource()
 			o.addSource(srcName, tnode)
-		case find.RX[regx.DSBL].Match(line): // add disable blacklist flag
+		case find.RX[regx.DSBL].Match(line): // add disable blocklist flag
 			c.Debug(fmt.Sprintf("Adding disable flag to %s: %s\n", tnode, string(line)))
 			c.disable(line, tnode, find)
 		case find.RX[regx.IPBH].Match(line) && isntSource(nodes): // add blackhole IP
@@ -430,7 +430,7 @@ func (c *Config) Blacklist(r ConfLoader) error {
 	}
 
 	if len(c.tree) < 1 {
-		return fmt.Errorf("%w has been detected", ErrNoBlacklistCfg)
+		return fmt.Errorf("%w has been detected", ErrNoBlocklistCfg)
 	}
 
 	c.Debug(fmt.Sprintf("Using router configuration %v", c.String()))
@@ -461,7 +461,7 @@ func (c *Config) sortKeys() (pkeys sort.StringSlice) {
 	return pkeys
 }
 
-// String returns pretty print for the Blacklist struct
+// String returns pretty print for the Blocklist struct
 func (c *Config) String() (s string) {
 	indent := 1
 	cc := comma

@@ -4,7 +4,7 @@
 # Add back files with extensions and directories
 !*.*
 !*/
-!blacklist.cfg
+!blocklist.cfg
 !license
 !make_*
 !Makefile
@@ -35,7 +35,7 @@
 *.tgz
 *.VC.db
 *.xml
-blacklist.*
+blocklist.*
 vendor/
 *.deb
 /coverage.txt

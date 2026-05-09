@@ -1,0 +1,7 @@
+priority: 999 # Run after DNS forwarding is configured
+help: Add and delete dnsmasq blocklisting, redirect IP, exclusions and URL sources
+
+end:
+    sudo _OFR_CONFIGURE=ok /config/scripts/update-dnsmasq -v
+
+ 

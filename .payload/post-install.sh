@@ -101,143 +101,143 @@ try() {
 	fi
 }
 
-noblacklist() {
-	${API} existsActive service dns forwarding blacklist && return 1
+noblocklist() {
+	${API} existsActive service dns forwarding blocklist && return 1
 	return 0
 }
 
-# Load the [service dns forwarding blacklist] configuration
+# Load the [service dns forwarding blocklist] configuration
 update_dns_config() {
 	try begin
-	# try set service dns forwarding blacklist disabled false
-	try set service dns forwarding blacklist dns-redirect-ip 0.0.0.0
-	try set service dns forwarding blacklist domains include adk2x.com
-	try set service dns forwarding blacklist domains include adsrvr.org
-	try set service dns forwarding blacklist domains include adtechus.net
-	try set service dns forwarding blacklist domains include advertising.com
-	try set service dns forwarding blacklist domains include centade.com
-	try set service dns forwarding blacklist domains include doubleclick.net
-	try set service dns forwarding blacklist domains include fastplayz.com
-	try set service dns forwarding blacklist domains include free-counter.co.uk
-	try set service dns forwarding blacklist domains include hilltopads.net
-	try set service dns forwarding blacklist domains include intellitxt.com
-	try set service dns forwarding blacklist domains include kiosked.com
-	try set service dns forwarding blacklist domains include patoghee.in
-	try set service dns forwarding blacklist domains include themillionaireinpjs.com
-	try set service dns forwarding blacklist domains include traktrafficflow.com
-	try set service dns forwarding blacklist domains include wwwpromoter.com
-	try set service dns forwarding blacklist domains source NoBitCoin description '"Blocking Web Browser Bitcoin Mining"'
-	try set service dns forwarding blacklist domains source NoBitCoin prefix '0.0.0.0'
-	try set service dns forwarding blacklist domains source NoBitCoin url 'https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt'
-	try set service dns forwarding blacklist domains source OISD description '"OISD Domains Small"'
-	try set service dns forwarding blacklist domains source OISD url 'https://small.oisd.nl/domainswild2'
-	try set service dns forwarding blacklist domains source simple_tracking description '"Basic tracking list by Disconnect"'
-	try set service dns forwarding blacklist domains source simple_tracking url 'https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt'
-	try set service dns forwarding blacklist exclude 1e100.net
-	try set service dns forwarding blacklist exclude 2o7.net
-	try set service dns forwarding blacklist exclude adjust.com
-	try set service dns forwarding blacklist exclude adobedtm.com
-	try set service dns forwarding blacklist exclude akamai.net
-	try set service dns forwarding blacklist exclude akamaihd.net
-	try set service dns forwarding blacklist exclude amazon.com
-	try set service dns forwarding blacklist exclude amazonaws.com
-	try set service dns forwarding blacklist exclude ampproject.org
-	try set service dns forwarding blacklist exclude android.clients.google.com
-	try set service dns forwarding blacklist exclude apple.com
-	try set service dns forwarding blacklist exclude apresolve.spotify.com
-	try set service dns forwarding blacklist exclude ask.com
-	try set service dns forwarding blacklist exclude avast.com
-	try set service dns forwarding blacklist exclude avira-update.com
-	try set service dns forwarding blacklist exclude bannerbank.com
-	try set service dns forwarding blacklist exclude bazaarvoice.com
-	try set service dns forwarding blacklist exclude bing.com
-	try set service dns forwarding blacklist exclude bit.ly
-	try set service dns forwarding blacklist exclude bitdefender.com
-	try set service dns forwarding blacklist exclude bonsaimirai.us9.list-manage.com
-	try set service dns forwarding blacklist exclude c.s-microsoft.com
-	try set service dns forwarding blacklist exclude cdn.ravenjs.com
-	try set service dns forwarding blacklist exclude cdn.visiblemeasures.com
-	try set service dns forwarding blacklist exclude clientconfig.passport.net
-	try set service dns forwarding blacklist exclude clients2.google.com
-	try set service dns forwarding blacklist exclude clients4.google.com
-	try set service dns forwarding blacklist exclude cloudfront.net
-	try set service dns forwarding blacklist exclude coremetrics.com
-	try set service dns forwarding blacklist exclude dickssportinggoods.com
-	try set service dns forwarding blacklist exclude dl.dropboxusercontent.com
-	try set service dns forwarding blacklist exclude dropbox.com
-	try set service dns forwarding blacklist exclude ebay.com
-	try set service dns forwarding blacklist exclude edgesuite.net
-	try set service dns forwarding blacklist exclude evernote.com
-	try set service dns forwarding blacklist exclude express.co.uk
-	try set service dns forwarding blacklist exclude feedly.com
-	try set service dns forwarding blacklist exclude freedns.afraid.org
-	try set service dns forwarding blacklist exclude github.com
-	try set service dns forwarding blacklist exclude githubusercontent.com
-	try set service dns forwarding blacklist exclude global.ssl.fastly.net
-	try set service dns forwarding blacklist exclude google.com
-	try set service dns forwarding blacklist exclude googleads.g.doubleclick.net
-	try set service dns forwarding blacklist exclude googleadservices.com
-	try set service dns forwarding blacklist exclude googleapis.com
-	try set service dns forwarding blacklist exclude googletagmanager.com
-	try set service dns forwarding blacklist exclude googleusercontent.com
-	try set service dns forwarding blacklist exclude gstatic.com
-	try set service dns forwarding blacklist exclude gvt1.com
-	try set service dns forwarding blacklist exclude gvt1.net
-	try set service dns forwarding blacklist exclude hb.disney.go.com
-	try set service dns forwarding blacklist exclude herokuapp.com
-	try set service dns forwarding blacklist exclude hp.com
-	try set service dns forwarding blacklist exclude hulu.com
-	try set service dns forwarding blacklist exclude i.s-microsoft.com
-	try set service dns forwarding blacklist exclude images-amazon.com
-	try set service dns forwarding blacklist exclude live.com
-	try set service dns forwarding blacklist exclude logmein.com
-	try set service dns forwarding blacklist exclude m.weeklyad.target.com
-	try set service dns forwarding blacklist exclude magnetmail1.net
-	try set service dns forwarding blacklist exclude microsoft.com
-	try set service dns forwarding blacklist exclude microsoftonline.com
-	try set service dns forwarding blacklist exclude msdn.com
-	try set service dns forwarding blacklist exclude msecnd.net
-	try set service dns forwarding blacklist exclude msftncsi.com
-	try set service dns forwarding blacklist exclude mywot.com
-	try set service dns forwarding blacklist exclude nsatc.net
-	try set service dns forwarding blacklist exclude outlook.office365.com
-	try set service dns forwarding blacklist exclude paypal.com
-	try set service dns forwarding blacklist exclude pop.h-cdn.co
-	try set service dns forwarding blacklist exclude products.office.com
-	try set service dns forwarding blacklist exclude quora.com
-	try set service dns forwarding blacklist exclude rackcdn.com
-	try set service dns forwarding blacklist exclude rarlab.com
-	try set service dns forwarding blacklist exclude s.youtube.com
-	try set service dns forwarding blacklist exclude schema.org
-	try set service dns forwarding blacklist exclude shopify.com
-	try set service dns forwarding blacklist exclude skype.com
-	try set service dns forwarding blacklist exclude smacargo.com
-	try set service dns forwarding blacklist exclude sourceforge.net
-	try set service dns forwarding blacklist exclude spclient.wg.spotify.com
-	try set service dns forwarding blacklist exclude spotify.com
-	try set service dns forwarding blacklist exclude spotify.edgekey.net
-	try set service dns forwarding blacklist exclude spotilocal.com
-	try set service dns forwarding blacklist exclude ssl-on9.com
-	try set service dns forwarding blacklist exclude ssl-on9.net
-	try set service dns forwarding blacklist exclude sstatic.net
-	try set service dns forwarding blacklist exclude static.chartbeat.com
-	try set service dns forwarding blacklist exclude storage.googleapis.com
-	try set service dns forwarding blacklist exclude twimg.com
-	try set service dns forwarding blacklist exclude video-stats.l.google.com
-	try set service dns forwarding blacklist exclude viewpoint.com
-	try set service dns forwarding blacklist exclude weeklyad.target.com
-	try set service dns forwarding blacklist exclude weeklyad.target.com.edgesuite.net
-	try set service dns forwarding blacklist exclude windows.net
-	try set service dns forwarding blacklist exclude www.msftncsi.com
-	try set service dns forwarding blacklist exclude xboxlive.com
-	try set service dns forwarding blacklist exclude yimg.com
-	try set service dns forwarding blacklist exclude ytimg.com
-	try set service dns forwarding blacklist hosts exclude cfvod.kaltura.com
-	try set service dns forwarding blacklist hosts include beap.gemini.yahoo.com
+	# try set service dns forwarding blocklist disabled false
+	try set service dns forwarding blocklist dns-redirect-ip 0.0.0.0
+	try set service dns forwarding blocklist domains include adk2x.com
+	try set service dns forwarding blocklist domains include adsrvr.org
+	try set service dns forwarding blocklist domains include adtechus.net
+	try set service dns forwarding blocklist domains include advertising.com
+	try set service dns forwarding blocklist domains include centade.com
+	try set service dns forwarding blocklist domains include doubleclick.net
+	try set service dns forwarding blocklist domains include fastplayz.com
+	try set service dns forwarding blocklist domains include free-counter.co.uk
+	try set service dns forwarding blocklist domains include hilltopads.net
+	try set service dns forwarding blocklist domains include intellitxt.com
+	try set service dns forwarding blocklist domains include kiosked.com
+	try set service dns forwarding blocklist domains include patoghee.in
+	try set service dns forwarding blocklist domains include themillionaireinpjs.com
+	try set service dns forwarding blocklist domains include traktrafficflow.com
+	try set service dns forwarding blocklist domains include wwwpromoter.com
+	try set service dns forwarding blocklist domains source NoBitCoin description '"Blocking Web Browser Bitcoin Mining"'
+	try set service dns forwarding blocklist domains source NoBitCoin prefix '0.0.0.0'
+	try set service dns forwarding blocklist domains source NoBitCoin url 'https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt'
+	try set service dns forwarding blocklist domains source OISD description '"OISD Domains Small"'
+	try set service dns forwarding blocklist domains source OISD url 'https://small.oisd.nl/domainswild2'
+	try set service dns forwarding blocklist domains source simple_tracking description '"Basic tracking list by Disconnect"'
+	try set service dns forwarding blocklist domains source simple_tracking url 'https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt'
+	try set service dns forwarding blocklist exclude 1e100.net
+	try set service dns forwarding blocklist exclude 2o7.net
+	try set service dns forwarding blocklist exclude adjust.com
+	try set service dns forwarding blocklist exclude adobedtm.com
+	try set service dns forwarding blocklist exclude akamai.net
+	try set service dns forwarding blocklist exclude akamaihd.net
+	try set service dns forwarding blocklist exclude amazon.com
+	try set service dns forwarding blocklist exclude amazonaws.com
+	try set service dns forwarding blocklist exclude ampproject.org
+	try set service dns forwarding blocklist exclude android.clients.google.com
+	try set service dns forwarding blocklist exclude apple.com
+	try set service dns forwarding blocklist exclude apresolve.spotify.com
+	try set service dns forwarding blocklist exclude ask.com
+	try set service dns forwarding blocklist exclude avast.com
+	try set service dns forwarding blocklist exclude avira-update.com
+	try set service dns forwarding blocklist exclude bannerbank.com
+	try set service dns forwarding blocklist exclude bazaarvoice.com
+	try set service dns forwarding blocklist exclude bing.com
+	try set service dns forwarding blocklist exclude bit.ly
+	try set service dns forwarding blocklist exclude bitdefender.com
+	try set service dns forwarding blocklist exclude bonsaimirai.us9.list-manage.com
+	try set service dns forwarding blocklist exclude c.s-microsoft.com
+	try set service dns forwarding blocklist exclude cdn.ravenjs.com
+	try set service dns forwarding blocklist exclude cdn.visiblemeasures.com
+	try set service dns forwarding blocklist exclude clientconfig.passport.net
+	try set service dns forwarding blocklist exclude clients2.google.com
+	try set service dns forwarding blocklist exclude clients4.google.com
+	try set service dns forwarding blocklist exclude cloudfront.net
+	try set service dns forwarding blocklist exclude coremetrics.com
+	try set service dns forwarding blocklist exclude dickssportinggoods.com
+	try set service dns forwarding blocklist exclude dl.dropboxusercontent.com
+	try set service dns forwarding blocklist exclude dropbox.com
+	try set service dns forwarding blocklist exclude ebay.com
+	try set service dns forwarding blocklist exclude edgesuite.net
+	try set service dns forwarding blocklist exclude evernote.com
+	try set service dns forwarding blocklist exclude express.co.uk
+	try set service dns forwarding blocklist exclude feedly.com
+	try set service dns forwarding blocklist exclude freedns.afraid.org
+	try set service dns forwarding blocklist exclude github.com
+	try set service dns forwarding blocklist exclude githubusercontent.com
+	try set service dns forwarding blocklist exclude global.ssl.fastly.net
+	try set service dns forwarding blocklist exclude google.com
+	try set service dns forwarding blocklist exclude googleads.g.doubleclick.net
+	try set service dns forwarding blocklist exclude googleadservices.com
+	try set service dns forwarding blocklist exclude googleapis.com
+	try set service dns forwarding blocklist exclude googletagmanager.com
+	try set service dns forwarding blocklist exclude googleusercontent.com
+	try set service dns forwarding blocklist exclude gstatic.com
+	try set service dns forwarding blocklist exclude gvt1.com
+	try set service dns forwarding blocklist exclude gvt1.net
+	try set service dns forwarding blocklist exclude hb.disney.go.com
+	try set service dns forwarding blocklist exclude herokuapp.com
+	try set service dns forwarding blocklist exclude hp.com
+	try set service dns forwarding blocklist exclude hulu.com
+	try set service dns forwarding blocklist exclude i.s-microsoft.com
+	try set service dns forwarding blocklist exclude images-amazon.com
+	try set service dns forwarding blocklist exclude live.com
+	try set service dns forwarding blocklist exclude logmein.com
+	try set service dns forwarding blocklist exclude m.weeklyad.target.com
+	try set service dns forwarding blocklist exclude magnetmail1.net
+	try set service dns forwarding blocklist exclude microsoft.com
+	try set service dns forwarding blocklist exclude microsoftonline.com
+	try set service dns forwarding blocklist exclude msdn.com
+	try set service dns forwarding blocklist exclude msecnd.net
+	try set service dns forwarding blocklist exclude msftncsi.com
+	try set service dns forwarding blocklist exclude mywot.com
+	try set service dns forwarding blocklist exclude nsatc.net
+	try set service dns forwarding blocklist exclude outlook.office365.com
+	try set service dns forwarding blocklist exclude paypal.com
+	try set service dns forwarding blocklist exclude pop.h-cdn.co
+	try set service dns forwarding blocklist exclude products.office.com
+	try set service dns forwarding blocklist exclude quora.com
+	try set service dns forwarding blocklist exclude rackcdn.com
+	try set service dns forwarding blocklist exclude rarlab.com
+	try set service dns forwarding blocklist exclude s.youtube.com
+	try set service dns forwarding blocklist exclude schema.org
+	try set service dns forwarding blocklist exclude shopify.com
+	try set service dns forwarding blocklist exclude skype.com
+	try set service dns forwarding blocklist exclude smacargo.com
+	try set service dns forwarding blocklist exclude sourceforge.net
+	try set service dns forwarding blocklist exclude spclient.wg.spotify.com
+	try set service dns forwarding blocklist exclude spotify.com
+	try set service dns forwarding blocklist exclude spotify.edgekey.net
+	try set service dns forwarding blocklist exclude spotilocal.com
+	try set service dns forwarding blocklist exclude ssl-on9.com
+	try set service dns forwarding blocklist exclude ssl-on9.net
+	try set service dns forwarding blocklist exclude sstatic.net
+	try set service dns forwarding blocklist exclude static.chartbeat.com
+	try set service dns forwarding blocklist exclude storage.googleapis.com
+	try set service dns forwarding blocklist exclude twimg.com
+	try set service dns forwarding blocklist exclude video-stats.l.google.com
+	try set service dns forwarding blocklist exclude viewpoint.com
+	try set service dns forwarding blocklist exclude weeklyad.target.com
+	try set service dns forwarding blocklist exclude weeklyad.target.com.edgesuite.net
+	try set service dns forwarding blocklist exclude windows.net
+	try set service dns forwarding blocklist exclude www.msftncsi.com
+	try set service dns forwarding blocklist exclude xboxlive.com
+	try set service dns forwarding blocklist exclude yimg.com
+	try set service dns forwarding blocklist exclude ytimg.com
+	try set service dns forwarding blocklist hosts exclude cfvod.kaltura.com
+	try set service dns forwarding blocklist hosts include beap.gemini.yahoo.com
 	# HaGeZi Pro (dnsmasq/pro.txt); Vyatta hosts source tag hageziPro.
-	try set service dns forwarding blacklist hosts source hageziPro description '"HaGeZi DNS Blocklists — Pro (dnsmasq)"'
-	try set service dns forwarding blacklist hosts source hageziPro prefix ''
-	try set service dns forwarding blacklist hosts source hageziPro url 'https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt'
+	try set service dns forwarding blocklist hosts source hageziPro description '"HaGeZi DNS Blocklists — Pro (dnsmasq)"'
+	try set service dns forwarding blocklist hosts source hageziPro prefix ''
+	try set service dns forwarding blocklist hosts source hageziPro url 'https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt'
 	try set system task-scheduler task update_edgeos_adblock executable arguments 10800
 	try set system task-scheduler task update_edgeos_adblock executable path /config/scripts/update-dnsmasq-cronjob.sh
 	try set system task-scheduler task update_edgeos_adblock interval 1d
@@ -262,7 +262,7 @@ set_vyattacfg_grp
 UPGRADE=0
 [[ "${1}" == "configure" ]] && [[ -z "${2}" ]] && UPGRADE=1
 
-noblacklist && UPGRADE=1
+noblocklist && UPGRADE=1
 
 # Only run the post installation script if this is a first time installation
 if [[ ${UPGRADE} == 1 ]] ; then

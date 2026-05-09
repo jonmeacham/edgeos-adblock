@@ -327,14 +327,14 @@ func TestGetCFG(t *testing.T) {
 	o := getOpts()
 	c := o.initEdgeOS()
 
-	_ = c.Blacklist(o.getCFG(c))
+	_ = c.Blocklist(o.getCFG(c))
 	if c.String() != mainGetConfig {
 		t.Error("main config mismatch")
 	}
 
 	origBkpCfgFile := bkpCfgFile
 	bkpCfgFile = "github.com/jonmeacham/edgeos-adblock/internal/testdata/config.test.boot"
-	_ = c.Blacklist(o.getCFG(c))
+	_ = c.Blocklist(o.getCFG(c))
 	if c.String() != mainGetConfig {
 		t.Error("after bkp path")
 	}
@@ -342,7 +342,7 @@ func TestGetCFG(t *testing.T) {
 
 	origFile := *o.File
 	*o.File = "github.com/jonmeacham/edgeos-adblock/internal/testdata/config.test.boot"
-	_ = c.Blacklist(o.getCFG(c))
+	_ = c.Blocklist(o.getCFG(c))
 	if c.String() != mainGetConfig {
 		t.Error("with file")
 	}
@@ -350,7 +350,7 @@ func TestGetCFG(t *testing.T) {
 
 	*o.MIPS64 = "arm64"
 	c = o.initEdgeOS()
-	_ = c.Blacklist(o.getCFG(c))
+	_ = c.Blocklist(o.getCFG(c))
 	if c.String() != intelCfg {
 		t.Error("intelCfg mismatch")
 	}
@@ -465,7 +465,7 @@ func TestInitEdgeOS(t *testing.T) {
 var (
 	mainGetConfig = `{
   "nodes": [{
-    "blacklist": {
+    "blocklist": {
       "disabled": "false",
       "ip": "192.168.168.1",
       "excludes": [

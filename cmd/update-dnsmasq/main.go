@@ -120,7 +120,7 @@ func initEnv() (c *e.Config, err error) {
 func loadConfig(c *e.Config, o *opts) (*e.Config, error) {
 	var err error
 
-	if err = c.Blacklist(o.getCFG(c)); err != nil {
+	if err = c.Blocklist(o.getCFG(c)); err != nil {
 		fmt.Fprintf(os.Stderr, "Removing stale dnsmasq edgeos-adblock files, because %v\n", err.Error())
 		if err = files(c).Remove(); err != nil {
 			fmt.Fprintf(os.Stderr, "%v", err.Error())

@@ -62,7 +62,7 @@ func TestFormatData(t *testing.T) {
 		Prefix("address=", "server="),
 	)
 
-	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+	if err := c.Blocklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
 		t.Fatal(err)
 	}
 

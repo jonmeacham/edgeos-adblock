@@ -54,7 +54,7 @@ For **reproducible** Linux builds and tests in CI, run **`docker build`** (or yo
 
 ## Router install (EdgeOS)
 
-Install the **`edgeos-adblock`** `.deb` for your router CPU, or use **`make_deb`** / your release pipeline. Vyatta templates live under **`.payload/`**; **`post-install.sh`** seeds blacklist sources and schedules **`update-dnsmasq`**. For UniFi **`config.gateway.json`** provisioning, see the sample at the repo root.
+Install the **`edgeos-adblock`** `.deb` for your router CPU, or use **`make_deb`** / your release pipeline. Vyatta templates live under **`.payload/`**; **`post-install.sh`** seeds blocklist sources and schedules **`update-dnsmasq`**. For UniFi **`config.gateway.json`** provisioning, see the sample at the repo root.
 
 ## Contract
 

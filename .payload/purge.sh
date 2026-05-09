@@ -83,19 +83,19 @@ echo_logger() {
 	echo "purge: ${MSG}" | fold -sw ${COLUMNS}
 }
 
-# Delete all blacklist configuration files /etc/dnsmasq.d
+# Delete all blocklist configuration files /etc/dnsmasq.d
 clean_dnsmasq() {
 	ls /etc/dnsmasq.d/{domains,hosts}.*.edgeos-adblock.conf 1>/dev/null 2>&1 &&
 		try rm -f /etc/dnsmasq.d/{domains,hosts}.*.edgeos-adblock.conf
 }
 
-# Delete the [service dns forwarding blacklist] configuration if it exists
+# Delete the [service dns forwarding blocklist] configuration if it exists
 delete_dns_config() {
-	/bin/cli-shell-api existsActive service dns forwarding blacklist
+	/bin/cli-shell-api existsActive service dns forwarding blocklist
 	if [[ $? == 0 ]]; then
 		try begin
 		try delete system task-scheduler task update_edgeos_adblock
-		try delete service dns forwarding blacklist
+		try delete service dns forwarding blocklist
 		try commit || {
 			echo_logger FE "Configuration commit failed — aborting purge"
 			try end 2>/dev/null || true

@@ -11,10 +11,10 @@ import (
 	"sync"
 )
 
-// ntype for labeling blacklist source types
+// ntype for labeling blocklist source types
 type ntype int
 
-// ntype label blacklist source types
+// ntype label blocklist source types
 //
 //go:generate go run golang.org/x/tools/cmd/stringer -type=ntype
 const (
@@ -24,9 +24,9 @@ const (
 	excHost              // Excluded from hosts
 	excRoot              // Excluded globally
 	host                 // Format type e.g. server=/www.d.com/0.0.0.0
-	preDomn              // Pre-configured blacklisted domains
-	preHost              // Pre-configured blacklisted hosts
-	preRoot              // Pre-configured global blacklist domains
+	preDomn              // Pre-configured blocklisted domains
+	preHost              // Pre-configured blocklisted hosts
+	preRoot              // Pre-configured global blocklist domains
 	root                 // Topmost root node
 )
 

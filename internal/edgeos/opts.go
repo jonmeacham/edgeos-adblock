@@ -150,7 +150,7 @@ func DNSsvc(s string) Option {
 	}
 }
 
-// Ext sets the blacklist file n extension
+// Ext sets the blocklist file n extension
 func Ext(s string) Option {
 	return func(c *Config) Option {
 		previous := c.Ext

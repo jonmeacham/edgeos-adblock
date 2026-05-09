@@ -1,6 +1,6 @@
 {
   "nodes": [{
-    "blacklist": {
+    "blocklist": {
       "disabled": "false",
       "ip": "0.0.0.0",
       "excludes": [

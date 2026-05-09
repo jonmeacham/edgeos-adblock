@@ -14,7 +14,7 @@ func TestConfigString(t *testing.T) {
 			Method("GET"),
 		)
 
-		if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+		if err := c.Blocklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
 			t.Fatal(err)
 		}
 		if got, want := c.String(), tdata.JSONcfg; got != want {
@@ -29,7 +29,7 @@ func TestConfigString(t *testing.T) {
 			Method("GET"),
 		)
 
-		if err := c.Blacklist(&CFGstatic{Cfg: tdata.ZeroHostSourcesCfg}); err != nil {
+		if err := c.Blocklist(&CFGstatic{Cfg: tdata.ZeroHostSourcesCfg}); err != nil {
 			t.Fatal(err)
 		}
 		if got, want := c.String(), tdata.JSONcfgZeroHostSources; got != want {

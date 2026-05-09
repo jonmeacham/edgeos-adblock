@@ -1,4 +1,4 @@
-# Makefile to build dnsmasq blacklist (canonical interface: make help)
+# Makefile to build dnsmasq blocklist (canonical interface: make help)
 PACKAGE 	= github.com/jonmeacham/edgeos-adblock
 SHELL		= /bin/bash
 
@@ -355,4 +355,4 @@ clean: ; @ $(info cleaning artefacts…) ## Remove build outputs, test artifacts
 	-o -name "*.tgz" -type f \
 	| xargs rm -f
 	@rm -rf test/tests.* test/coverage.*
-	@rm -rf /tmp/testBlacklist*
+	@rm -rf /tmp/testBlocklist*

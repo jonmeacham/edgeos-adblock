@@ -12,17 +12,17 @@ EdgeOS configuration data and files.
 const (
 
  // ExcDomns is a string labels for domain exclusions
- ExcDomns = "whitelisted-subdomains"
+ ExcDomns = "allowlisted-subdomains"
  // ExcHosts is a string labels for host exclusions
- ExcHosts = "whitelisted-servers"
+ ExcHosts = "allowlisted-servers"
  // ExcRoots is a string labels for preconfigured global domain exclusions
- ExcRoots = "global-whitelisted-domains"
- // PreDomns is a string label for preconfigured whitelisted domains
- PreDomns = "blacklisted-subdomains"
- // PreHosts is a string label for preconfigured blacklisted hosts
- PreHosts = "blacklisted-servers"
- // PreRoots is a string label for preconfigured global blacklisted hosts
- PreRoots = "global-blacklisted-domains"
+ ExcRoots = "global-allowlisted-domains"
+ // PreDomns is a string label for preconfigured blocklisted subdomains
+ PreDomns = "blocklisted-subdomains"
+ // PreHosts is a string label for preconfigured blocklisted hosts
+ PreHosts = "blocklisted-servers"
+ // PreRoots is a string label for preconfigured global blocklisted hosts
+ PreRoots = "global-blocklisted-domains"
  // False is a string constant
  False = "false"
  // True is a string constant
@@ -148,13 +148,13 @@ func NewConfig(opts ...Option) *Config
 NewConfig returns a new *Config initialized with the parameter options passed to
 it
 
-#### func (*Config) Blacklist
+#### func (*Config) Blocklist
 
 ```go
-func (c *Config) Blacklist(r ConfLoader) error
+func (c *Config) Blocklist(r ConfLoader) error
 ```
 
-Blacklist extracts blacklist nodes from a EdgeOS/VyOS configuration structure
+Blocklist extracts blocklist nodes from a EdgeOS/VyOS configuration structure
 
 #### func (*Config) Get
 
@@ -235,7 +235,7 @@ the last set of arg's previous values
 func (c *Config) String() (s string)
 ```
 
-String returns pretty print for the Blacklist struct
+String returns pretty print for the Blocklist struct
 
 #### type Contenter
 
@@ -692,7 +692,7 @@ Disabled toggles Disabled
 func Ext(s string) Option
 ```
 
-Ext sets the blacklist file n extension
+Ext sets the blocklist file n extension
 
 #### func  File
 

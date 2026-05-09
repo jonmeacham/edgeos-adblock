@@ -129,7 +129,7 @@ var c = config{
 	},
 	regx.LBRC: test{
 		index:  0,
-		input:  []byte(`blacklist {`),
+		input:  []byte(`blocklist {`),
 		result: []byte(`{`),
 	},
 	regx.LEAF: test{
@@ -139,8 +139,8 @@ var c = config{
 	},
 	regx.MISC: test{
 		index:  0,
-		input:  []byte(`blacklist-bigot`),
-		result: []byte(`blacklist-bigot`),
+		input:  []byte(`blocklist-bigot`),
+		result: []byte(`blocklist-bigot`),
 	},
 	regx.MLTI: test{
 		index:  2,
@@ -164,7 +164,7 @@ var c = config{
 	},
 	regx.RBRC: test{
 		index:  0,
-		input:  []byte(`} blacklist`),
+		input:  []byte(`} blocklist`),
 		result: []byte(`}`),
 	},
 	regx.SUFX: test{

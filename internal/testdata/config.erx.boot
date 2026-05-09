@@ -60,7 +60,7 @@ service {
     }
     dns {
         forwarding {
-            blacklist {
+            blocklist {
                 disabled false
                 dns-redirect-ip 0.0.0.0
                 domains {

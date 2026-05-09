@@ -1,4 +1,4 @@
-blacklist {
+blocklist {
         disabled false
         dns-redirect-ip 192.168.168.1
         domains {

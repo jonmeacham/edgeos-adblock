@@ -104,29 +104,29 @@ try() {
 	fi
 }
 
-isblacklist() {
-	${API} existsActive service dns forwarding blacklist && return 0
+isblocklist() {
+	${API} existsActive service dns forwarding blocklist && return 0
 	return 1
 }
 
-# Back up [service dns forwarding blacklist]
+# Back up [service dns forwarding blocklist]
 backup_dns_config() {
-	if isblacklist; then
+	if isblocklist; then
 		file="/config/user-data/edgeos-adblock.${DATE}.cmds"
-		echo_logger I "Backing up blacklist configuration to: ${file}"
+		echo_logger I "Backing up blocklist configuration to: ${file}"
 		echo "edit service dns forwarding" > ${file} 
-		${API} showConfig service dns forwarding blacklist \
+		${API} showConfig service dns forwarding blocklist \
 		--show-commands --show-active-only | \
-		grep blacklist >> ${file} || \
-		echo_logger E 'Blacklist configuration backup failed!'
+		grep blocklist >> ${file} || \
+		echo_logger E 'Blocklist configuration backup failed!'
 	fi
 }
 
-# Delete the [service dns forwarding blacklist] configuration
+# Delete the [service dns forwarding blocklist] configuration
 delete_dns_config() {
 	try begin
 	try delete system task-scheduler task update_edgeos_adblock
-	try delete service dns forwarding blacklist
+	try delete service dns forwarding blocklist
 	try commit || {
 		echo_logger FE "Configuration commit failed — aborting pre-remove"
 		try end 2>/dev/null || true
@@ -155,7 +155,7 @@ restart_dnsmasq() {
 
 # echo "$@"
 
-# Back up the existing blacklist configuration
+# Back up the existing blocklist configuration
 backup_dns_config
 
 # Only run the pre-installation script if this is a first time installation

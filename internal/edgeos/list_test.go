@@ -13,16 +13,16 @@ import (
 func TestKeys(t *testing.T) {
 	var keys sort.StringSlice
 	c := NewConfig()
-	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+	if err := c.Blocklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
 		t.Fatal(err)
 	}
 
-	wantKeys := sort.StringSlice{"blacklist", "domains", "hosts"}
+	wantKeys := sort.StringSlice{"blocklist", "domains", "hosts"}
 	if !reflect.DeepEqual(c.sortKeys(), wantKeys) {
 		t.Errorf("sortKeys(): got %#v, want %#v", c.sortKeys(), wantKeys)
 	}
 
-	wantNames := sort.StringSlice{"blacklisted-servers", "blacklisted-subdomains", "global-blacklisted-domains", "hageziPro", "tasty"}
+	wantNames := sort.StringSlice{"blocklisted-servers", "blocklisted-subdomains", "global-blocklisted-domains", "hageziPro", "tasty"}
 	if !reflect.DeepEqual(c.GetAll().Names(), wantNames) {
 		t.Errorf("Names(): got %#v, want %#v", c.GetAll().Names(), wantNames)
 	}

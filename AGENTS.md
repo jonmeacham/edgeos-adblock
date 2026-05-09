@@ -10,7 +10,7 @@ Packaging scripts under `.payload/` apply configuration **only** through the Vya
 
 Cron helpers that only sleep and invoke `/config/scripts/update-dnsmasq` do not touch the CLI configuration tree; they do not need a Vyatta configure session.
 
-This fork names the periodic task **`update_edgeos_adblock`** (under `system task-scheduler task`) and generates dnsmasq includes matching `*.edgeos-adblock.conf`. The Vyatta service node remains **`service dns forwarding blacklist`**—that is the EdgeOS CLI subtree installed by the package and must not be renamed in automation.
+This fork names the periodic task **`update_edgeos_adblock`** (under `system task-scheduler task`) and generates dnsmasq includes matching `*.edgeos-adblock.conf`. The Vyatta service node remains **`service dns forwarding blocklist`**—that is the EdgeOS CLI subtree installed by the package and must not be renamed in automation.
 
 ---
 

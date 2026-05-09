@@ -16,7 +16,7 @@ import (
 func TestAddInc(t *testing.T) {
 	var (
 		c   = NewConfig()
-		err = c.Blacklist(&CFGstatic{Cfg: tdata.Cfg})
+		err = c.Blocklist(&CFGstatic{Cfg: tdata.Cfg})
 	)
 
 	if err != nil {
@@ -64,7 +64,7 @@ func TestAddInc(t *testing.T) {
 					Timeout: time.Duration(0),
 					Verb:    false,
 				},
-				desc:     "pre-configured global blacklisted domains",
+				desc:     "pre-configured global blocklisted domains",
 				disabled: false,
 				err:      nil,
 				exc:      nil,
@@ -72,8 +72,8 @@ func TestAddInc(t *testing.T) {
 				inc:      []string{},
 				iface:    PreRObj,
 				ip:       "0.0.0.0",
-				ltype:    "global-blacklisted-domains",
-				name:     "global-blacklisted-domains",
+				ltype:    "global-blocklisted-domains",
+				name:     "global-blocklisted-domains",
 				nType:    ntype(8),
 				Objects: Objects{
 					Env: nil,
@@ -120,7 +120,7 @@ func TestAddInc(t *testing.T) {
 					Timeout: time.Duration(0),
 					Verb:    false,
 				},
-				desc:     "pre-configured blacklisted subdomains",
+				desc:     "pre-configured blocklisted subdomains",
 				disabled: false,
 				err:      nil,
 				exc:      nil,
@@ -128,8 +128,8 @@ func TestAddInc(t *testing.T) {
 				inc:      []string{},
 				iface:    PreDObj,
 				ip:       "192.168.100.1",
-				ltype:    "blacklisted-subdomains",
-				name:     "blacklisted-subdomains",
+				ltype:    "blocklisted-subdomains",
+				name:     "blocklisted-subdomains",
 				nType:    ntype(6),
 				Objects: Objects{
 					Env: nil,
@@ -176,7 +176,7 @@ func TestAddInc(t *testing.T) {
 					Timeout: time.Duration(0),
 					Verb:    false,
 				},
-				desc:     "pre-configured blacklisted servers",
+				desc:     "pre-configured blocklisted servers",
 				disabled: false,
 				err:      nil,
 				exc:      nil,
@@ -184,8 +184,8 @@ func TestAddInc(t *testing.T) {
 				iface:    PreHObj,
 				inc:      []string{"beap.gemini.yahoo.com"},
 				ip:       "0.0.0.0",
-				ltype:    "blacklisted-servers",
-				name:     "blacklisted-servers",
+				ltype:    "blocklisted-servers",
+				name:     "blocklisted-servers",
 				nType:    ntype(7),
 				Objects: Objects{
 					Env: nil,
@@ -251,15 +251,15 @@ func TestFiles(t *testing.T) {
 		Ext("edgeos-adblock.conf"),
 	)
 
-	if err := c.Blacklist(r); err != nil {
+	if err := c.Blocklist(r); err != nil {
 		t.Fatal(err)
 	}
 
-	exp := `/tmp/domains.blacklisted-subdomains.edgeos-adblock.conf
+	exp := `/tmp/domains.blocklisted-subdomains.edgeos-adblock.conf
 /tmp/domains.tasty.edgeos-adblock.conf
-/tmp/hosts.blacklisted-servers.edgeos-adblock.conf
+/tmp/hosts.blocklisted-servers.edgeos-adblock.conf
 /tmp/hosts.hageziPro.edgeos-adblock.conf
-/tmp/roots.global-blacklisted-domains.edgeos-adblock.conf`
+/tmp/roots.global-blocklisted-domains.edgeos-adblock.conf`
 
 	act := c.GetAll().Files().String()
 	if act != exp {
@@ -298,7 +298,7 @@ func TestIsSource(t *testing.T) {
 func TestNodeExists(t *testing.T) {
 	var (
 		c   = NewConfig()
-		err = c.Blacklist(&CFGstatic{Cfg: tdata.Cfg})
+		err = c.Blocklist(&CFGstatic{Cfg: tdata.Cfg})
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -326,30 +326,30 @@ func TestReadCfg(t *testing.T) {
 	}
 
 	t.Run("configuration loaded from file", func(t *testing.T) {
-		act := NewConfig().Blacklist(&CFGstatic{Cfg: string(b)})
+		act := NewConfig().Blocklist(&CFGstatic{Cfg: string(b)})
 		if act != nil {
-			t.Fatalf("Blacklist: got %v, want nil", act)
+			t.Fatalf("Blocklist: got %v, want nil", act)
 		}
 	})
 
 	t.Run("empty configuration", func(t *testing.T) {
-		act := NewConfig().Blacklist(&CFGstatic{Cfg: ""})
-		if !errors.Is(act, ErrNoBlacklistCfg) {
-			t.Fatalf("got %v, want ErrNoBlacklistCfg", act)
+		act := NewConfig().Blocklist(&CFGstatic{Cfg: ""})
+		if !errors.Is(act, ErrNoBlocklistCfg) {
+			t.Fatalf("got %v, want ErrNoBlocklistCfg", act)
 		}
-		if act.Error() != "no EdgeOS dns forwarding blacklist configuration has been detected" {
+		if act.Error() != "no EdgeOS dns forwarding blocklist configuration has been detected" {
 			t.Errorf("wrong error message: %q", act.Error())
 		}
 	})
 	t.Run("disabled configuration", func(t *testing.T) {
-		act := NewConfig().Blacklist(&CFGstatic{Cfg: tdata.DisabledCfg})
+		act := NewConfig().Blocklist(&CFGstatic{Cfg: tdata.DisabledCfg})
 		if act != nil {
 			t.Fatalf("got %v, want nil", act)
 		}
 	})
 
 	t.Run("single source configuration", func(t *testing.T) {
-		act := NewConfig().Blacklist(&CFGstatic{Cfg: tdata.SingleSource})
+		act := NewConfig().Blocklist(&CFGstatic{Cfg: tdata.SingleSource})
 		if act != nil {
 			t.Fatalf("got %v, want nil", act)
 		}
@@ -357,10 +357,10 @@ func TestReadCfg(t *testing.T) {
 
 	t.Run("active configuration", func(t *testing.T) {
 		c := NewConfig()
-		if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+		if err := c.Blocklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
 			t.Fatal(err)
 		}
-		want := []string{"blacklist", "domains", "hosts"}
+		want := []string{"blocklist", "domains", "hosts"}
 		if !reflect.DeepEqual(c.Nodes(), want) {
 			t.Errorf("Nodes(): got %#v, want %#v", c.Nodes(), want)
 		}
@@ -368,11 +368,11 @@ func TestReadCfg(t *testing.T) {
 }
 
 func TestReadUnconfiguredCfg(t *testing.T) {
-	act := NewConfig().Blacklist(&CFGstatic{Cfg: tdata.NoBlacklist})
-	if !errors.Is(act, ErrNoBlacklistCfg) {
-		t.Fatalf("got %v, want ErrNoBlacklistCfg", act)
+	act := NewConfig().Blocklist(&CFGstatic{Cfg: tdata.NoBlocklist})
+	if !errors.Is(act, ErrNoBlocklistCfg) {
+		t.Fatalf("got %v, want ErrNoBlocklistCfg", act)
 	}
-	if act.Error() != "no EdgeOS dns forwarding blacklist configuration has been detected" {
+	if act.Error() != "no EdgeOS dns forwarding blocklist configuration has been detected" {
 		t.Errorf("wrong error message: %q", act.Error())
 	}
 }
@@ -401,7 +401,7 @@ func TestRemove(t *testing.T) {
 		WCard(Wildcard{Node: "*s", Name: "*"}),
 	)
 
-	if err := c.Blacklist(&CFGstatic{Cfg: tdata.CfgMimimal}); err != nil {
+	if err := c.Blocklist(&CFGstatic{Cfg: tdata.CfgMimimal}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -487,7 +487,7 @@ func TestGetAll(t *testing.T) {
 		Ext(".edgeos-adblock.conf"),
 	)
 
-	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+	if err := c.Blocklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -538,19 +538,19 @@ func TestValidate(t *testing.T) {
 
 var (
 	expDomainObj = `
-Desc:         "pre-configured blacklisted subdomains"
+Desc:         "pre-configured blocklisted subdomains"
 Disabled:     "false"
 File:         "**Undefined**"
 IP:           "192.168.100.1"
-Ltype:        "blacklisted-subdomains"
-Name:         "blacklisted-subdomains"
+Ltype:        "blocklisted-subdomains"
+Name:         "blocklisted-subdomains"
 nType:        "preDomn"
 Prefix:       "**Undefined**"
-Type:         "blacklisted-subdomains"
+Type:         "blocklisted-subdomains"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 
 Desc:         "File source"
@@ -563,9 +563,9 @@ nType:        "domn"
 Prefix:       "**Undefined**"
 Type:         "domains"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 `
 
@@ -580,41 +580,41 @@ nType:        "domn"
 Prefix:       "**Undefined**"
 Type:         "domains"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 `
 
 	expGetAll = `
-Desc:         "pre-configured global blacklisted domains"
+Desc:         "pre-configured global blocklisted domains"
 Disabled:     "false"
 File:         "**Undefined**"
 IP:           "0.0.0.0"
-Ltype:        "global-blacklisted-domains"
-Name:         "global-blacklisted-domains"
+Ltype:        "global-blocklisted-domains"
+Name:         "global-blocklisted-domains"
 nType:        "preRoot"
 Prefix:       "**Undefined**"
-Type:         "global-blacklisted-domains"
+Type:         "global-blocklisted-domains"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 
-Desc:         "pre-configured blacklisted subdomains"
+Desc:         "pre-configured blocklisted subdomains"
 Disabled:     "false"
 File:         "**Undefined**"
 IP:           "192.168.100.1"
-Ltype:        "blacklisted-subdomains"
-Name:         "blacklisted-subdomains"
+Ltype:        "blocklisted-subdomains"
+Name:         "blocklisted-subdomains"
 nType:        "preDomn"
 Prefix:       "**Undefined**"
-Type:         "blacklisted-subdomains"
+Type:         "blocklisted-subdomains"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 
 Desc:         "File source"
@@ -627,24 +627,24 @@ nType:        "domn"
 Prefix:       "**Undefined**"
 Type:         "domains"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 
-Desc:         "pre-configured blacklisted servers"
+Desc:         "pre-configured blocklisted servers"
 Disabled:     "false"
 File:         "**Undefined**"
 IP:           "0.0.0.0"
-Ltype:        "blacklisted-servers"
-Name:         "blacklisted-servers"
+Ltype:        "blocklisted-servers"
+Name:         "blocklisted-servers"
 nType:        "preHost"
 Prefix:       "**Undefined**"
-Type:         "blacklisted-servers"
+Type:         "blocklisted-servers"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "beap.gemini.yahoo.com"
 
 Desc:         "HaGeZi DNS Blocklists — Pro (dnsmasq)"
@@ -657,26 +657,26 @@ nType:        "host"
 Prefix:       "**Undefined**"
 Type:         "hosts"
 URL:          "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 `
 
 	expHostObj = `
-Desc:         "pre-configured blacklisted servers"
+Desc:         "pre-configured blocklisted servers"
 Disabled:     "false"
 File:         "**Undefined**"
 IP:           "0.0.0.0"
-Ltype:        "blacklisted-servers"
-Name:         "blacklisted-servers"
+Ltype:        "blocklisted-servers"
+Name:         "blocklisted-servers"
 nType:        "preHost"
 Prefix:       "**Undefined**"
-Type:         "blacklisted-servers"
+Type:         "blocklisted-servers"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "beap.gemini.yahoo.com"
 
 Desc:         "HaGeZi DNS Blocklists — Pro (dnsmasq)"
@@ -689,41 +689,41 @@ nType:        "host"
 Prefix:       "**Undefined**"
 Type:         "hosts"
 URL:          "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 `
 
 	expPre = `
-Desc:         "pre-configured blacklisted subdomains"
+Desc:         "pre-configured blocklisted subdomains"
 Disabled:     "false"
 File:         "**Undefined**"
 IP:           "192.168.100.1"
-Ltype:        "blacklisted-subdomains"
-Name:         "blacklisted-subdomains"
+Ltype:        "blocklisted-subdomains"
+Name:         "blocklisted-subdomains"
 nType:        "preDomn"
 Prefix:       "**Undefined**"
-Type:         "blacklisted-subdomains"
+Type:         "blocklisted-subdomains"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 
-Desc:         "pre-configured blacklisted servers"
+Desc:         "pre-configured blocklisted servers"
 Disabled:     "false"
 File:         "**Undefined**"
 IP:           "0.0.0.0"
-Ltype:        "blacklisted-servers"
-Name:         "blacklisted-servers"
+Ltype:        "blocklisted-servers"
+Name:         "blocklisted-servers"
 nType:        "preHost"
 Prefix:       "**Undefined**"
-Type:         "blacklisted-servers"
+Type:         "blocklisted-servers"
 URL:          "**Undefined**"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "beap.gemini.yahoo.com"
 `
 
@@ -738,9 +738,9 @@ nType:        "host"
 Prefix:       "**Undefined**"
 Type:         "hosts"
 URL:          "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt"
-Whitelist:
+Allowlist:
               "**No entries found**"
-Blacklist:
+Blocklist:
               "**No entries found**"
 `
 )

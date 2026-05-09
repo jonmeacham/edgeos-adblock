@@ -14,7 +14,7 @@ func TestObjectsAddObj(t *testing.T) {
 		Ext("edgeos-adblock.conf"),
 	)
 
-	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+	if err := c.Blocklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -38,7 +38,7 @@ func TestObjectString(t *testing.T) {
 		Ext("edgeos-adblock.conf"),
 	)
 
-	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+	if err := c.Blocklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -93,7 +93,7 @@ func TestFilter(t *testing.T) {
 		Ext("edgeos-adblock.conf"),
 	)
 
-	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+	if err := c.Blocklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
 		t.Fatal(err)
 	}
 
