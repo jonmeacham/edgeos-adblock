@@ -1,9 +1,6 @@
 package tdata
 
-// HaGeZiDNSMasqDefault is the recommended dnsmasq-format subscription: HaGeZi **Pro**
-// (via jsDelivr CDN, dns-blocklists dnsmasq/pro.txt). Pro is materially larger than Multi NORMAL
-// (~193k vs ~156k entries) and aligns better with legacy “stack many lists” EdgeOS setups while still
-// avoiding a project-maintained domain blocklist—use blacklist excludes/includes only for local tuning.
+// HaGeZiDNSMasqDefault is the recommended HaGeZi dnsmasq-format subscription URL (Pro tier, dnsmasq/pro.txt via jsDelivr).
 const HaGeZiDNSMasqDefault = "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt"
 
 // Get returns r

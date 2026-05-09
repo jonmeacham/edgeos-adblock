@@ -52,6 +52,10 @@ For **reproducible** Linux builds and tests in CI, run **`docker build`** (or yo
 - **`make generate`** — stringer via `go generate`; needs a matching **`golang.org/x/tools`** in the module graph (use the same Go version as **`go.mod` `toolchain`**).
 - **`make mipsle`**, **`make build`**, **`make pkgs`** — full release / `.deb` paths (still use **make** for EdgeOS packages; use **Docker** when you want a clean module-only build for Linux).
 
+## Router install (EdgeOS)
+
+Install the **`edgeos-adblock`** `.deb` for your router CPU, or use **`make_deb`** / your release pipeline. Vyatta templates live under **`.payload/`**; **`post-install.sh`** seeds blacklist sources and schedules **`update-dnsmasq`**. For UniFi **`config.gateway.json`** provisioning, see the sample at the repo root.
+
 ## Contract
 
 Anything you remove from the tree should still allow **`make ci`** (host) and/or a successful **`docker build`** (container), depending on which path you support in your infrastructure.

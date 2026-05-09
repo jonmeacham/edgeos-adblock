@@ -2,7 +2,7 @@
 --
     import "github.com/jonmeacham/edgeos-adblock/internal/tdata"
 
-Strings below mirror `tdata.go`. HaGeZi defaults use **Pro** (`dnsmasq/pro.txt`) under the EdgeOS hosts source tag **`hageziPro`**.
+Strings below mirror `tdata.go`. Example hosts subscriptions use **[HaGeZi DNS Blocklists](https://github.com/hagezi/dns-blocklists)** dnsmasq format under Vyatta source tag **`hageziPro`**.
 
 ## Usage
 
