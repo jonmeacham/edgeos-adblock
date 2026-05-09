@@ -461,37 +461,6 @@ func (c *Config) sortKeys() (pkeys sort.StringSlice) {
 	return pkeys
 }
 
-// String returns pretty print for the Blocklist struct
-func (c *Config) String() (s string) {
-	indent := 1
-	cc := comma
-	cnt := len(c.sortKeys())
-	s += fmt.Sprintf("{\n%v%q: [{\n", tabs(indent), "nodes")
-
-	for i, pkey := range c.sortKeys() {
-		if i == cnt-1 {
-			cc = null
-		}
-
-		indent++
-		s += fmt.Sprintf("%v%q: {\n", tabs(indent), pkey)
-		indent++
-
-		s += fmt.Sprintf("%v%q: %q,\n", tabs(indent), disabled, booltoStr(c.tree[pkey].disabled))
-		s = is(indent, s, "ip", c.tree[pkey].ip)
-		s += getJSONArray(&cfgJSON{array: c.tree[pkey].exc, pk: pkey, leaf: "excludes", indent: indent})
-		s += getJSONArray(&cfgJSON{array: c.tree[pkey].inc, pk: pkey, leaf: "includes", indent: indent})
-		s += getJSONsrcArray(&cfgJSON{Config: c, pk: pkey, indent: indent})
-
-		indent--
-		s += fmt.Sprintf("%v}%v\n", tabs(indent), cc)
-		indent--
-	}
-
-	s += tabs(indent) + "}]\n}"
-	return s
-}
-
 func (c tree) getIP(node string) string {
 	if c.keyExists(node) && c[node].ip != "" {
 		return c[node].ip

@@ -464,116 +464,126 @@ func TestInitEdgeOS(t *testing.T) {
 
 var (
 	mainGetConfig = `{
-  "nodes": [{
-    "blocklist": {
-      "disabled": "false",
-      "ip": "192.168.168.1",
-      "excludes": [
-        "1e100.net",
-        "2o7.net",
-        "adobedtm.com",
-        "akamai.net",
-        "akamaihd.net",
-        "amazon.com",
-        "amazonaws.com",
-        "apple.com",
-        "ask.com",
-        "avast.com",
-        "avira-update.com",
-        "bannerbank.com",
-        "bing.com",
-        "bit.ly",
-        "bitdefender.com",
-        "cdn.ravenjs.com",
-        "cdn.visiblemeasures.com",
-        "cloudfront.net",
-        "coremetrics.com",
-        "dropbox.com",
-        "ebay.com",
-        "edgesuite.net",
-        "evernote.com",
-        "express.co.uk",
-        "feedly.com",
-        "freedns.afraid.org",
-        "github.com",
-        "githubusercontent.com",
-        "global.ssl.fastly.net",
-        "google.com",
-        "googleads.g.doubleclick.net",
-        "googleadservices.com",
-        "googleapis.com",
-        "googletagmanager.com",
-        "googleusercontent.com",
-        "gstatic.com",
-        "gvt1.com",
-        "gvt1.net",
-        "hb.disney.go.com",
-        "herokuapp.com",
-        "hp.com",
-        "hulu.com",
-        "images-amazon.com",
-        "live.com",
-        "magnetmail1.net",
-        "microsoft.com",
-        "microsoftonline.com",
-        "msdn.com",
-        "msecnd.net",
-        "msftncsi.com",
-        "mywot.com",
-        "nsatc.net",
-        "paypal.com",
-        "pop.h-cdn.co",
-        "rackcdn.com",
-        "rarlab.com",
-        "schema.org",
-        "shopify.com",
-        "skype.com",
-        "smacargo.com",
-        "sourceforge.net",
-        "spotify.com",
-        "spotify.edgekey.net",
-        "spotilocal.com",
-        "ssl-on9.com",
-        "ssl-on9.net",
-        "sstatic.net",
-        "static.chartbeat.com",
-        "storage.googleapis.com",
-        "twimg.com",
-        "viewpoint.com",
-        "windows.net",
-        "xboxlive.com",
-        "yimg.com",
-        "ytimg.com"
+  "nodes": [
+    {
+      "blocklist": {
+        "disabled": "false",
+        "ip": "192.168.168.1",
+        "excludes": [
+          "1e100.net",
+          "2o7.net",
+          "adobedtm.com",
+          "akamai.net",
+          "akamaihd.net",
+          "amazon.com",
+          "amazonaws.com",
+          "apple.com",
+          "ask.com",
+          "avast.com",
+          "avira-update.com",
+          "bannerbank.com",
+          "bing.com",
+          "bit.ly",
+          "bitdefender.com",
+          "cdn.ravenjs.com",
+          "cdn.visiblemeasures.com",
+          "cloudfront.net",
+          "coremetrics.com",
+          "dropbox.com",
+          "ebay.com",
+          "edgesuite.net",
+          "evernote.com",
+          "express.co.uk",
+          "feedly.com",
+          "freedns.afraid.org",
+          "github.com",
+          "githubusercontent.com",
+          "global.ssl.fastly.net",
+          "google.com",
+          "googleads.g.doubleclick.net",
+          "googleadservices.com",
+          "googleapis.com",
+          "googletagmanager.com",
+          "googleusercontent.com",
+          "gstatic.com",
+          "gvt1.com",
+          "gvt1.net",
+          "hb.disney.go.com",
+          "herokuapp.com",
+          "hp.com",
+          "hulu.com",
+          "images-amazon.com",
+          "live.com",
+          "magnetmail1.net",
+          "microsoft.com",
+          "microsoftonline.com",
+          "msdn.com",
+          "msecnd.net",
+          "msftncsi.com",
+          "mywot.com",
+          "nsatc.net",
+          "paypal.com",
+          "pop.h-cdn.co",
+          "rackcdn.com",
+          "rarlab.com",
+          "schema.org",
+          "shopify.com",
+          "skype.com",
+          "smacargo.com",
+          "sourceforge.net",
+          "spotify.com",
+          "spotify.edgekey.net",
+          "spotilocal.com",
+          "ssl-on9.com",
+          "ssl-on9.net",
+          "sstatic.net",
+          "static.chartbeat.com",
+          "storage.googleapis.com",
+          "twimg.com",
+          "viewpoint.com",
+          "windows.net",
+          "xboxlive.com",
+          "yimg.com",
+          "ytimg.com"
         ],
-      "includes": [],
-      "sources": [{}]
-    },
-    "domains": {
-      "disabled": "false",
-      "excludes": [],
-      "includes": [],
-      "sources": [{
-        "tasty": {
-          "disabled": "false",
-          "description": "File source",
-          "ip": "10.10.10.10",
-          "file": "../../internal/testdata/blist.hosts.src",
-        }
-    }]
-    },
-    "hosts": {
-      "disabled": "false",
-      "excludes": [],
-      "includes": ["beap.gemini.yahoo.com"],
-      "sources": [{
-        "hageziPro": {
-          "disabled": "false",
-          "description": "HaGeZi DNS Blocklists — Pro (dnsmasq)",
-          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt",
-        }
-    }]
+        "includes": [],
+        "sources": [
+          {}
+        ]
+      },
+      "domains": {
+        "disabled": "false",
+        "excludes": [],
+        "includes": [],
+        "sources": [
+          {
+            "tasty": {
+              "disabled": "false",
+              "description": "File source",
+              "ip": "10.10.10.10",
+              "file": "../../internal/testdata/blist.hosts.src"
+            }
+          }
+        ]
+      },
+      "hosts": {
+        "disabled": "false",
+        "excludes": [],
+        "includes": [
+          "beap.gemini.yahoo.com"
+        ],
+        "sources": [
+          {
+            "hageziPro": {
+              "disabled": "false",
+              "description": "HaGeZi DNS Blocklists — Pro (dnsmasq)",
+              "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt"
+            }
+          }
+        ]
+      }
     }
-  }]
+  ]
 }`
 
 	expMap = `"1e100.net":{},
@@ -653,7 +663,8 @@ var (
 "ytimg.com":{},
 `
 	intelCfg = `{
-  "nodes": [{
-  }]
+  "nodes": [
+    {}
+  ]
 }`
 )

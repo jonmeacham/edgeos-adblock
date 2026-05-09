@@ -551,92 +551,102 @@ system {
 
 	// JSONcfg is JSON formatted blocklist configuration output
 	JSONcfg = `{
-  "nodes": [{
-    "blocklist": {
-      "disabled": "false",
-      "ip": "0.0.0.0",
-      "excludes": [
-        "1e100.net",
-        "2o7.net",
-        "adobedtm.com",
-        "akamai.net",
-        "akamaihd.net",
-        "amazon.com",
-        "amazonaws.com",
-        "apple.com",
-        "ask.com",
-        "avast.com",
-        "bitdefender.com",
-        "cdn.visiblemeasures.com",
-        "cloudfront.net",
-        "coremetrics.com",
-        "edgesuite.net",
-        "freedns.afraid.org",
-        "github.com",
-        "githubusercontent.com",
-        "google.com",
-        "googleadservices.com",
-        "googleapis.com",
-        "googletagmanager.com",
-        "googleusercontent.com",
-        "gstatic.com",
-        "gvt1.com",
-        "gvt1.net",
-        "hb.disney.go.com",
-        "hp.com",
-        "hulu.com",
-        "images-amazon.com",
-        "live.com",
-        "microsoft.com",
-        "msdn.com",
-        "msecnd.net",
-        "paypal.com",
-        "rackcdn.com",
-        "schema.org",
-        "shopify.com",
-        "skype.com",
-        "smacargo.com",
-        "sourceforge.net",
-        "ssl-on9.com",
-        "ssl-on9.net",
-        "sstatic.net",
-        "static.chartbeat.com",
-        "storage.googleapis.com",
-        "windows.net",
-        "xboxlive.com",
-        "yimg.com",
-        "ytimg.com"
+  "nodes": [
+    {
+      "blocklist": {
+        "disabled": "false",
+        "ip": "0.0.0.0",
+        "excludes": [
+          "1e100.net",
+          "2o7.net",
+          "adobedtm.com",
+          "akamai.net",
+          "akamaihd.net",
+          "amazon.com",
+          "amazonaws.com",
+          "apple.com",
+          "ask.com",
+          "avast.com",
+          "bitdefender.com",
+          "cdn.visiblemeasures.com",
+          "cloudfront.net",
+          "coremetrics.com",
+          "edgesuite.net",
+          "freedns.afraid.org",
+          "github.com",
+          "githubusercontent.com",
+          "google.com",
+          "googleadservices.com",
+          "googleapis.com",
+          "googletagmanager.com",
+          "googleusercontent.com",
+          "gstatic.com",
+          "gvt1.com",
+          "gvt1.net",
+          "hb.disney.go.com",
+          "hp.com",
+          "hulu.com",
+          "images-amazon.com",
+          "live.com",
+          "microsoft.com",
+          "msdn.com",
+          "msecnd.net",
+          "paypal.com",
+          "rackcdn.com",
+          "schema.org",
+          "shopify.com",
+          "skype.com",
+          "smacargo.com",
+          "sourceforge.net",
+          "ssl-on9.com",
+          "ssl-on9.net",
+          "sstatic.net",
+          "static.chartbeat.com",
+          "storage.googleapis.com",
+          "windows.net",
+          "xboxlive.com",
+          "yimg.com",
+          "ytimg.com"
         ],
-      "includes": [],
-      "sources": [{}]
-    },
-    "domains": {
-      "disabled": "false",
-      "ip": "192.168.100.1",
-      "excludes": [],
-      "includes": [],
-      "sources": [{
-        "tasty": {
-          "disabled": "false",
-          "description": "File source",
-          "ip": "10.10.10.10",
-          "file": "../../internal/testdata/blist.hosts.src",
-        }
-    }]
-    },
-    "hosts": {
-      "disabled": "false",
-      "excludes": [],
-      "includes": ["beap.gemini.yahoo.com"],
-      "sources": [{
-        "hageziPro": {
-          "disabled": "false",
-          "description": "HaGeZi DNS Blocklists — Pro (dnsmasq)",
-          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt",
-        }
-    }]
+        "includes": [],
+        "sources": [
+          {}
+        ]
+      },
+      "domains": {
+        "disabled": "false",
+        "ip": "192.168.100.1",
+        "excludes": [],
+        "includes": [],
+        "sources": [
+          {
+            "tasty": {
+              "disabled": "false",
+              "description": "File source",
+              "ip": "10.10.10.10",
+              "file": "../../internal/testdata/blist.hosts.src"
+            }
+          }
+        ]
+      },
+      "hosts": {
+        "disabled": "false",
+        "excludes": [],
+        "includes": [
+          "beap.gemini.yahoo.com"
+        ],
+        "sources": [
+          {
+            "hageziPro": {
+              "disabled": "false",
+              "description": "HaGeZi DNS Blocklists — Pro (dnsmasq)",
+              "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt"
+            }
+          }
+        ]
+      }
     }
-  }]
+  ]
 }`
 
 	// JSONrawcfg is JSON unformatted blocklist configuration output
@@ -644,77 +654,87 @@ system {
 
 	// JSONcfgZeroHostSources is JSON formatted blocklist configuration output with zero sources for hosts
 	JSONcfgZeroHostSources = `{
-  "nodes": [{
-    "blocklist": {
-      "disabled": "false",
-      "ip": "0.0.0.0",
-      "excludes": [
-        "122.2o7.net",
-        "1e100.net",
-        "adobedtm.com",
-        "akamai.net",
-        "amazon.com",
-        "amazonaws.com",
-        "apple.com",
-        "ask.com",
-        "avast.com",
-        "bitdefender.com",
-        "cdn.visiblemeasures.com",
-        "cloudfront.net",
-        "coremetrics.com",
-        "edgesuite.net",
-        "freedns.afraid.org",
-        "github.com",
-        "githubusercontent.com",
-        "google.com",
-        "googleadservices.com",
-        "googleapis.com",
-        "googleusercontent.com",
-        "gstatic.com",
-        "gvt1.com",
-        "gvt1.net",
-        "hb.disney.go.com",
-        "hp.com",
-        "hulu.com",
-        "images-amazon.com",
-        "msdn.com",
-        "paypal.com",
-        "rackcdn.com",
-        "schema.org",
-        "skype.com",
-        "smacargo.com",
-        "sourceforge.net",
-        "ssl-on9.com",
-        "ssl-on9.net",
-        "static.chartbeat.com",
-        "storage.googleapis.com",
-        "windows.net",
-        "yimg.com",
-        "ytimg.com"
+  "nodes": [
+    {
+      "blocklist": {
+        "disabled": "false",
+        "ip": "0.0.0.0",
+        "excludes": [
+          "122.2o7.net",
+          "1e100.net",
+          "adobedtm.com",
+          "akamai.net",
+          "amazon.com",
+          "amazonaws.com",
+          "apple.com",
+          "ask.com",
+          "avast.com",
+          "bitdefender.com",
+          "cdn.visiblemeasures.com",
+          "cloudfront.net",
+          "coremetrics.com",
+          "edgesuite.net",
+          "freedns.afraid.org",
+          "github.com",
+          "githubusercontent.com",
+          "google.com",
+          "googleadservices.com",
+          "googleapis.com",
+          "googleusercontent.com",
+          "gstatic.com",
+          "gvt1.com",
+          "gvt1.net",
+          "hb.disney.go.com",
+          "hp.com",
+          "hulu.com",
+          "images-amazon.com",
+          "msdn.com",
+          "paypal.com",
+          "rackcdn.com",
+          "schema.org",
+          "skype.com",
+          "smacargo.com",
+          "sourceforge.net",
+          "ssl-on9.com",
+          "ssl-on9.net",
+          "static.chartbeat.com",
+          "storage.googleapis.com",
+          "windows.net",
+          "yimg.com",
+          "ytimg.com"
         ],
-      "includes": [],
-      "sources": [{}]
-    },
-    "domains": {
-      "disabled": "false",
-      "excludes": [],
-      "includes": [],
-      "sources": [{
-        "malc0de": {
-          "disabled": "false",
-          "description": "List of zones serving malicious executables observed by malc0de.com/database/",
-          "prefix": "zone ",
-          "url": "http://malc0de.com/bl/ZONES",
-        }
-    }]
-    },
-    "hosts": {
-      "disabled": "false",
-      "excludes": [],
-      "includes": ["beap.gemini.yahoo.com"],
-      "sources": [{}]
+        "includes": [],
+        "sources": [
+          {}
+        ]
+      },
+      "domains": {
+        "disabled": "false",
+        "excludes": [],
+        "includes": [],
+        "sources": [
+          {
+            "malc0de": {
+              "disabled": "false",
+              "description": "List of zones serving malicious executables observed by malc0de.com/database/",
+              "prefix": "zone ",
+              "url": "http://malc0de.com/bl/ZONES"
+            }
+          }
+        ]
+      },
+      "hosts": {
+        "disabled": "false",
+        "excludes": [],
+        "includes": [
+          "beap.gemini.yahoo.com"
+        ],
+        "sources": [
+          {}
+        ]
+      }
     }
-  }]
+  ]
 }`
 	// FileManifest is complete list of the blocklist config node templates
 	FileManifest = `../payload/blocklist
