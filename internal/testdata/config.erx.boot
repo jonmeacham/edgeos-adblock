@@ -64,37 +64,10 @@ service {
                 disabled false
                 dns-redirect-ip 0.0.0.0
                 domains {
-                    include adk2x.com
-                    include adsrvr.org
-                    include adtechus.net
-                    include advertising.com
-                    include centade.com
-                    include doubleclick.net
-                    include fastplayz.com
-                    include free-counter.co.uk
-                    include hilltopads.net
-                    include intellitxt.com
-                    include kiosked.com
-                    include patoghee.in
-                    include themillionaireinpjs.com
-                    include traktrafficflow.com
-                    include wwwpromoter.com
-                    source malc0de {
-                        description "List of zones serving malicious executables observed by malc0de.com/database/"
-                        prefix zone
-                        url http://malc0de.com/bl/ZONES
-                    }
-                    source malwaredomains.com {
-                        description "Just Domains"
-                        url http://mirror1.malwaredomains.com/files/justdomains
-                    }
-                    source simple_tracking {
-                        description "Basic tracking list by Disconnect"
-                        url https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
-                    }
-                    source zeus {
-                        description "abuse.ch ZeuS domain blocklist"
-                        url https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist
+                    source tasty {
+                        description "File source"
+                        dns-redirect-ip 10.10.10.10
+                        file ../../internal/testdata/blist.hosts.src
                     }
                 }
                 exclude 1e100.net
@@ -168,26 +141,10 @@ service {
                 exclude ytimg.com
                 hosts {
                     include beap.gemini.yahoo.com
-                    include ads.feedly.com
-                    source openphish {
-                        description "OpenPhish automatic phishing detection"
-                        prefix http
-                        url https://openphish.com/feed.txt
-                    }
-                    source raw.github.com {
-                        description "This hosts file is a merged collection of hosts from reputable sources"
-                        prefix 0.0.0.0
-                        url https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-                    }
-                    source sysctl.org {
-                        description "This hosts file is a merged collection of hosts from Cameleon"
-                        prefix 127.0.0.1
-                        url http://sysctl.org/cameleon/hosts
-                    }
-                    source yoyo {
-                        description "Fully Qualified Domain Names only - no prefix to strip"
-                        prefix 127.0.0.1
-                        url http://pgl.yoyo.org/as/serverlist.php
+                    source hageziPro {
+                        description "HaGeZi DNS Blocklists — Pro (dnsmasq)"
+                        prefix ""
+                        url https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt
                     }
                 }
             }
@@ -291,7 +248,7 @@ system {
         }
     }
     task-scheduler {
-        task update_blacklists {
+        task update_edgeos_adblock {
             executable {
                 path /config/scripts/update-dnsmasq
             }

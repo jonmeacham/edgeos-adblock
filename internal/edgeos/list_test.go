@@ -2,30 +2,38 @@ package edgeos
 
 import (
 	"fmt"
+	"reflect"
 	"sort"
 	"sync"
 	"testing"
 
-	"github.com/britannic/blacklist/internal/tdata"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/jonmeacham/edgeos-adblock/internal/tdata"
 )
 
 func TestKeys(t *testing.T) {
-	Convey("Testing Keys()", t, func() {
-		var keys sort.StringSlice
-		c := NewConfig()
-		So(c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}), ShouldBeNil)
+	var keys sort.StringSlice
+	c := NewConfig()
+	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+		t.Fatal(err)
+	}
 
-		So(c.sortKeys(), ShouldResemble, sort.StringSlice{"blacklist", "domains", "hosts"})
+	wantKeys := sort.StringSlice{"blacklist", "domains", "hosts"}
+	if !reflect.DeepEqual(c.sortKeys(), wantKeys) {
+		t.Errorf("sortKeys(): got %#v, want %#v", c.sortKeys(), wantKeys)
+	}
 
-		So(c.GetAll().Names(), ShouldResemble, sort.StringSlice{"blacklisted-servers", "blacklisted-subdomains", "global-blacklisted-domains", "malc0de", "malwaredomains.com", "openphish", "raw.github.com", "simple_tracking", "sysctl.org", "tasty", "volkerschatz", "yoyo", "zeus"})
+	wantNames := sort.StringSlice{"blacklisted-servers", "blacklisted-subdomains", "global-blacklisted-domains", "hageziPro", "tasty"}
+	if !reflect.DeepEqual(c.GetAll().Names(), wantNames) {
+		t.Errorf("Names(): got %#v, want %#v", c.GetAll().Names(), wantNames)
+	}
 
-		for _, k := range []string{"a", "b", "c", "z", "q", "s", "e", "i", "x", "m"} {
-			keys = append(keys, k)
-		}
+	for _, k := range []string{"a", "b", "c", "z", "q", "s", "e", "i", "x", "m"} {
+		keys = append(keys, k)
+	}
 
-		So(keys.Len(), ShouldEqual, 10)
-	})
+	if keys.Len() != 10 {
+		t.Errorf("keys.Len(): got %d, want 10", keys.Len())
+	}
 }
 
 func TestKeyExists(t *testing.T) {
@@ -42,12 +50,14 @@ func TestKeyExists(t *testing.T) {
 			"two.three.four.five.six.intellitxt.com":         struct{}{},
 		},
 	}
-	Convey("Testing KeyExists()", t, func() {
-		for _, k := range keyArray {
-			So(exp.keyExists([]byte(k)), ShouldBeTrue)
+	for _, k := range keyArray {
+		if !exp.keyExists(k) {
+			t.Errorf("keyExists(%s): expected true", k)
 		}
-		So(exp.keyExists([]byte("zKeyDoesn'tExist")), ShouldBeFalse)
-	})
+	}
+	if exp.keyExists([]byte("zKeyDoesn'tExist")) {
+		t.Error("keyExists(missing): expected false")
+	}
 }
 
 func TestSubKeyExists(t *testing.T) {
@@ -64,39 +74,42 @@ func TestSubKeyExists(t *testing.T) {
 			"two.three.four.five.six.intellitxt.com":         struct{}{},
 		},
 	}
-	Convey("Testing KeyExists()", t, func() {
-		for _, k := range keyArray {
-			So(exp.subKeyExists([]byte(k)), ShouldBeTrue)
+	for _, k := range keyArray {
+		if !exp.subKeyExists(k) {
+			t.Errorf("subKeyExists: expected true for %s", k)
 		}
-		So(exp.subKeyExists([]byte("zKeyDoesn'tExist")), ShouldBeFalse)
-		So(exp.subKeyExists([]byte("com")), ShouldBeFalse)
-	})
+	}
+	if exp.subKeyExists([]byte("zKeyDoesn'tExist")) {
+		t.Error("subKeyExists: expected false for missing key")
+	}
+	if exp.subKeyExists([]byte("com")) {
+		t.Error("subKeyExists(com): expected false")
+	}
 }
 
 func TestMerge(t *testing.T) {
-	Convey("Testing merge()", t, func() {
-		testList1 := list{RWMutex: &sync.RWMutex{}, entry: make(entry)}
-		testList2 := list{RWMutex: &sync.RWMutex{}, entry: make(entry)}
-		exp := list{RWMutex: &sync.RWMutex{}, entry: make(entry)}
+	testList1 := list{RWMutex: &sync.RWMutex{}, entry: make(entry)}
+	testList2 := list{RWMutex: &sync.RWMutex{}, entry: make(entry)}
+	exp := list{RWMutex: &sync.RWMutex{}, entry: make(entry)}
 
-		for i := range Iter(20) {
-			exp.entry[fmt.Sprint(i)] = struct{}{}
-			switch {
-			case i%2 == 0:
-				testList1.entry[fmt.Sprint(i)] = struct{}{}
-			case i%2 != 0:
-				testList2.entry[fmt.Sprint(i)] = struct{}{}
-			}
+	for i := range Iter(20) {
+		exp.entry[fmt.Sprint(i)] = struct{}{}
+		switch {
+		case i%2 == 0:
+			testList1.entry[fmt.Sprint(i)] = struct{}{}
+		case i%2 != 0:
+			testList2.entry[fmt.Sprint(i)] = struct{}{}
 		}
-		testList1.merge(&testList2)
+	}
+	testList1.merge(&testList2)
 
-		So(testList1, ShouldResemble, exp)
-	})
+	if !reflect.DeepEqual(testList1, exp) {
+		t.Errorf("merge: got %#v, want %#v", testList1, exp)
+	}
 }
 
 func TestString(t *testing.T) {
-	Convey("Testing String()", t, func() {
-		exp := `"a.applovin.com":{},
+	exp := `"a.applovin.com":{},
 "a.glcdn.co":{},
 "a.vserv.mobi":{},
 "ad.leadboltapps.net":{},
@@ -119,8 +132,9 @@ func TestString(t *testing.T) {
 "ads.mobilityware.com":{},
 "ads.mopub.com":{},
 `
-		So(act.String(), ShouldEqual, exp)
-	})
+	if got, want := act.String(), exp; got != want {
+		t.Errorf("String(): mismatch\n got:\n%s\n want:\n%s", got, want)
+	}
 }
 
 var (

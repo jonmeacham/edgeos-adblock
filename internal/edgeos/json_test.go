@@ -3,31 +3,37 @@ package edgeos
 import (
 	"testing"
 
-	"github.com/britannic/blacklist/internal/tdata"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/jonmeacham/edgeos-adblock/internal/tdata"
 )
 
 func TestConfigString(t *testing.T) {
-	Convey("Testing ConfigString()", t, func() {
+	t.Run("full cfg", func(t *testing.T) {
 		c := NewConfig(
 			Dir("/tmp"),
-			Ext("blacklist.conf"),
+			Ext("edgeos-adblock.conf"),
 			Method("GET"),
 		)
 
-		So(c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}), ShouldBeNil)
-		So(c.String(), ShouldEqual, tdata.JSONcfg)
+		if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+			t.Fatal(err)
+		}
+		if got, want := c.String(), tdata.JSONcfg; got != want {
+			t.Errorf("String(): got %q, want %q", got, want)
+		}
+	})
 
-		c = NewConfig(
+	t.Run("zero host sources", func(t *testing.T) {
+		c := NewConfig(
 			Dir("/tmp"),
-			Ext("blacklist.conf"),
+			Ext("edgeos-adblock.conf"),
 			Method("GET"),
 		)
 
-		So(c.Blacklist(&CFGstatic{Cfg: tdata.ZeroHostSourcesCfg}), ShouldBeNil)
-		So(c.String(), ShouldEqual, tdata.JSONcfgZeroHostSources)
-
-		// So(c.ReadCfg(&CFGstatic{Cfg: tdata.SingleSource}), ShouldBeNil)
-		// So(c.String(), ShouldEqual, "")
+		if err := c.Blacklist(&CFGstatic{Cfg: tdata.ZeroHostSourcesCfg}); err != nil {
+			t.Fatal(err)
+		}
+		if got, want := c.String(), tdata.JSONcfgZeroHostSources; got != want {
+			t.Errorf("String(): got %q, want %q", got, want)
+		}
 	})
 }

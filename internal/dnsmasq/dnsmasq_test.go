@@ -3,16 +3,13 @@ package dnsmasq
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"path/filepath"
 	"testing"
-
-	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestConfigFile(t *testing.T) {
-	Convey("Testing ConfigFile()", t, func() {
+	t.Run("dnsmasq entries loaded from files", func(t *testing.T) {
 		var (
 			b     []byte
 			dir   = "../testdata/etc/dnsmasq.d/"
@@ -21,36 +18,48 @@ func TestConfigFile(t *testing.T) {
 			r     io.Reader
 		)
 
-		Convey("Testing with a dnsmasq entries loaded from files", func() {
-			files, err = filepath.Glob(dir + "*.conf")
-			So(err, ShouldBeNil)
+		files, err = filepath.Glob(dir + "*.conf")
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			for _, f := range files {
-				Convey("Parsing file: "+f, func() {
-					if r, err = ConfigFile(f); err != nil {
-						Printf("cannot open configuration file %s!", f)
+		for _, f := range files {
+			t.Run(f, func(t *testing.T) {
+				r, err = ConfigFile(f)
+				if err != nil {
+					t.Fatalf("cannot open configuration file %s: %v", f, err)
+				}
+
+				b, err = io.ReadAll(r)
+				if err != nil {
+					t.Fatal(err)
+				}
+				c := make(Conf)
+				ip := "0.0.0.0"
+				if err := c.Parse(&Mapping{Contents: b}); err != nil {
+					t.Fatal(err)
+				}
+
+				for k := range c {
+					if !c.Redirect(k, ip) {
+						t.Errorf("Redirect(%q, %q): expected true", k, ip)
 					}
+				}
+			})
+		}
+	})
 
-					b, _ = io.ReadAll(r)
-					c := make(Conf)
-					ip := "0.0.0.0"
-					So(c.Parse(&Mapping{Contents: b}), ShouldBeNil)
+	t.Run("misdirected dnsmasq address entry", func(t *testing.T) {
+		c := make(Conf)
+		ip := "0.0.0.0"
+		k := "address=/www.google.com/0.0.0.0"
 
-					for k := range c {
-						So(c.Redirect(k, ip), ShouldBeTrue)
-					}
-				})
-			}
-		})
-
-		Convey("Testing a misdirected dnsmasq address entry...", func() {
-			c := make(Conf)
-			ip := "0.0.0.0"
-			k := "address=/www.google.com/0.0.0.0"
-
-			So(c.Parse(&Mapping{Contents: []byte(k)}), ShouldBeNil)
-			So(c.Redirect(k, ip), ShouldBeFalse)
-		})
+		if err := c.Parse(&Mapping{Contents: []byte(k)}); err != nil {
+			t.Fatal(err)
+		}
+		if c.Redirect(k, ip) {
+			t.Error("Redirect: expected false for misdirected entry")
+		}
 	})
 }
 
@@ -110,14 +119,16 @@ func TestFetchHost(t *testing.T) {
 		},
 	}
 
-	Convey("Testing String()", t, func() {
-		for _, tt := range tests {
-			Convey("current test "+tt.name, func() {
-				So(fetchHost(tt.key, tt.ip), ShouldEqual, tt.exp)
-				So(tt.conf.Redirect(tt.key, tt.ip), ShouldEqual, tt.exp)
-			})
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, want := fetchHost(tt.key, tt.ip), tt.exp; got != want {
+				t.Errorf("fetchHost: got %v, want %v", got, want)
+			}
+			if got, want := tt.conf.Redirect(tt.key, tt.ip), tt.exp; got != want {
+				t.Errorf("Redirect: got %v, want %v", got, want)
+			}
+		})
+	}
 }
 
 func TestMatchIP(t *testing.T) {
@@ -133,14 +144,13 @@ func TestMatchIP(t *testing.T) {
 		{name: "Normal specified", exp: true, ip: "192.167.2.2", ips: []string{"192.167.2.2", "192.167.2.2", "192.167.2.2"}},
 		{name: "Normal unspecified", exp: true, ip: "0.0.0.0", ips: []string{"0.0.0.0", "0.0.0.0", "0.0.0.0"}},
 	}
-	Convey("Testing matchIP() with:", t, func() {
-		for _, tt := range tests {
-			Convey(tt.name, func() {
-				fmt.Println(matchIP(tt.ip, tt.ips))
-				So(matchIP(tt.ip, tt.ips), ShouldEqual, tt.exp)
-			})
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, want := matchIP(tt.ip, tt.ips), tt.exp; got != want {
+				t.Errorf("matchIP: got %v, want %v", got, want)
+			}
+		})
+	}
 }
 
 func TestParse(t *testing.T) {
@@ -186,19 +196,29 @@ func TestParse(t *testing.T) {
 # This can be changed by editing /etc/default/dnsmasq`)},
 		},
 	}
-	Convey("Conf map should show each map entry", t, func() {
-		c := make(Conf)
-		for _, tt := range tests {
-			Convey("current test: "+tt.name, func() {
-				if err := c.Parse(&tt.reader); err != nil {
-					So(err.Error(), ShouldEqual, tt.err.Error())
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := make(Conf)
+			err := c.Parse(&tt.reader)
+			if tt.err != nil {
+				if err == nil {
+					t.Fatal("Parse: expected error")
 				}
-				j, err := json.Marshal(c)
-				So(err, ShouldBeNil)
-				So(string(j), ShouldEqual, tt.act)
-			})
-		}
-	})
+				if err.Error() != tt.err.Error() {
+					t.Fatalf("Parse error: got %q, want %q", err.Error(), tt.err.Error())
+				}
+			} else if err != nil {
+				t.Fatal(err)
+			}
+			j, err := json.Marshal(c)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(j) != tt.act {
+				t.Errorf("Marshal: got %s, want %s", string(j), tt.act)
+			}
+		})
+	}
 }
 
 func TestString(t *testing.T) {
@@ -215,9 +235,9 @@ func TestString(t *testing.T) {
 		},
 	}
 
-	Convey("Testing String()", t, func() {
-		for _, tt := range tests {
-			So(tt.conf.String(), ShouldEqual, tt.exp)
+	for _, tt := range tests {
+		if got, want := tt.conf.String(), tt.exp; got != want {
+			t.Errorf("String(): got %s, want %s", got, want)
 		}
-	})
+	}
 }

@@ -1,5 +1,11 @@
 package tdata
 
+// HaGeZiDNSMasqDefault is the recommended dnsmasq-format subscription: HaGeZi **Pro**
+// (via jsDelivr CDN, dns-blocklists dnsmasq/pro.txt). Pro is materially larger than Multi NORMAL
+// (~193k vs ~156k entries) and aligns better with legacy “stack many lists” EdgeOS setups while still
+// avoiding a project-maintained domain blocklist—use blacklist excludes/includes only for local tuning.
+const HaGeZiDNSMasqDefault = "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt"
+
 // Get returns r
 func Get(s string) string {
 	switch s {
@@ -24,36 +30,10 @@ var (
     dns-redirect-ip 0.0.0.0
     domains {
         dns-redirect-ip 192.168.100.1
-        include adsrvr.org
-        include adtechus.net
-        include advertising.com
-        include centade.com
-        include doubleclick.net
-        include free-counter.co.uk
-        include intellitxt.com
-        include kiosked.com
-        include patoghee.in
-        source malc0de {
-            dns-redirect-ip 192.168.168.1
-            description "List of zones serving malicious executables observed by malc0de.com/database/"
-            prefix "zone "
-            url http://malc0de.com/bl/ZONES
-        }
-        source malwaredomains.com {
-            dns-redirect-ip 10.0.0.1
-            description "Just domains"
-            prefix ""
-            url http://mirror1.malwaredomains.com/files/justdomains
-        }
-        source simple_tracking {
-            description "Basic tracking list by Disconnect"
-            prefix ""
-            url https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
-        }
-        source zeus {
-            description "abuse.ch ZeuS domain blocklist"
-            prefix ""
-            url https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist
+        source tasty {
+            description "File source"
+            dns-redirect-ip 10.10.10.10
+            file ../../internal/testdata/blist.hosts.src
         }
     }
     exclude 1e100.net
@@ -108,36 +88,10 @@ var (
     exclude ytimg.com
     hosts {
         include beap.gemini.yahoo.com
-        source openphish {
-            description "OpenPhish automatic phishing detection"
-            prefix http
-            url https://openphish.com/feed.txt
-        }
-        source raw.github.com {
-            description "This hosts file is a merged collection of hosts from reputable sources"
-            prefix "0.0.0.0 "
-            url https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-        }
-        source sysctl.org {
-            dns-redirect-ip 172.16.16.1
-            description "This hosts file is a merged collection of hosts from cameleon"
-            prefix "127.0.0.1	 "
-            url http://sysctl.org/cameleon/hosts
-        }
-        source tasty {
-            description "File source"
-            dns-redirect-ip 10.10.10.10
-            file ../internal/testdata/blist.hosts.src
-        }
-        source volkerschatz {
-            description "Ad server blacklists"
-            prefix http
-            url http://www.volkerschatz.com/net/adpaths
-        }
-        source yoyo {
-            description "Fully Qualified Domain Names only - no prefix to strip"
+        source hageziPro {
+            description "HaGeZi DNS Blocklists — Pro (dnsmasq)"
             prefix ""
-            url https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=1&mimetype=plaintext
+            url https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt
         }
     }
 }
@@ -152,18 +106,10 @@ var (
     disabled false
     dns-redirect-ip 0.0.0.0
     domains {
-        include adsrvr.org
-        include adtechus.net
-        include advertising.com
-        include centade.com
-        include doubleclick.net
-        include free-counter.co.uk
-        include intellitxt.com
-        include kiosked.com
-        source malc0de {
-            description "List of zones serving malicious executables observed by malc0de.com/database/"
-            prefix "zone "
-            url http://malc0de.com/bl/ZONES
+        source hageziPro {
+            description "HaGeZi DNS Blocklists — Pro (dnsmasq)"
+            prefix ""
+            url https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt
         }
     }
     exclude 122.2o7.net
@@ -218,18 +164,10 @@ var (
     disabled false
     dns-redirect-ip 0.0.0.0
     domains {
-        include adsrvr.org
-        include adtechus.net
-        include advertising.com
-        include centade.com
-        include doubleclick.net
-        include free-counter.co.uk
-        include intellitxt.com
-        include kiosked.com
-        source malc0de {
-            description "List of zones serving malicious executables observed by malc0de.com/database/"
-            prefix "zone "
-            url http://malc0de.com/bl/ZONES
+        source hageziPro {
+            description "HaGeZi DNS Blocklists — Pro (dnsmasq)"
+            prefix ""
+            url https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt
         }
     }
     exclude ytimg.com
@@ -238,7 +176,7 @@ var (
         source tasty {
             description "File source"
             dns-redirect-ip 10.10.10.10
-            file ../internal/testdata/blist.hosts.src
+            file ../../internal/testdata/blist.hosts.src
         }
     }
 }`
@@ -406,7 +344,7 @@ system {
         }
     }
     task-scheduler {
-        task update_blacklists {
+        task update_edgeos_adblock {
             executable {
                 path /config/scripts/update-dnsmasq
             }
@@ -531,7 +469,7 @@ system {
             source tasty {
                 description "File source"
                 dns-redirect-ip 10.10.10.10
-                file ./internal/testdata/blist.hosts.src
+                file ../../internal/testdata/blist.hosts.src
             }
             source volkerschatz {
                 description "Ad server blacklists"
@@ -557,14 +495,6 @@ system {
 	dns-redirect-ip 0.0.0.0
 	domains {
 			dns-redirect-ip
-			include adsrvr.org
-			include adtechus.net
-			include advertising.com
-			include centade.com
-			include doubleclick.net
-			include free-counter.co.uk
-			include intellitxt.com
-			include kiosked.com
 			source malc0de {
 					description "List of zones serving malicious executables observed by malc0de.com/database/"
 					prefix "zone "
@@ -687,40 +617,13 @@ system {
       "disabled": "false",
       "ip": "192.168.100.1",
       "excludes": [],
-      "includes": [
-        "adsrvr.org",
-        "adtechus.net",
-        "advertising.com",
-        "centade.com",
-        "doubleclick.net",
-        "free-counter.co.uk",
-        "intellitxt.com",
-        "kiosked.com",
-        "patoghee.in"
-        ],
+      "includes": [],
       "sources": [{
-        "malc0de": {
+        "tasty": {
           "disabled": "false",
-          "description": "List of zones serving malicious executables observed by malc0de.com/database/",
-          "ip": "192.168.168.1",
-          "prefix": "zone ",
-          "url": "http://malc0de.com/bl/ZONES",
-        },
-        "malwaredomains.com": {
-          "disabled": "false",
-          "description": "Just domains",
-          "ip": "10.0.0.1",
-          "url": "http://mirror1.malwaredomains.com/files/justdomains",
-        },
-        "simple_tracking": {
-          "disabled": "false",
-          "description": "Basic tracking list by Disconnect",
-          "url": "https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt",
-        },
-        "zeus": {
-          "disabled": "false",
-          "description": "abuse.ch ZeuS domain blocklist",
-          "url": "https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist",
+          "description": "File source",
+          "ip": "10.10.10.10",
+          "file": "../../internal/testdata/blist.hosts.src",
         }
     }]
     },
@@ -729,41 +632,10 @@ system {
       "excludes": [],
       "includes": ["beap.gemini.yahoo.com"],
       "sources": [{
-        "openphish": {
+        "hageziPro": {
           "disabled": "false",
-          "description": "OpenPhish automatic phishing detection",
-          "prefix": "http",
-          "url": "https://openphish.com/feed.txt",
-        },
-        "raw.github.com": {
-          "disabled": "false",
-          "description": "This hosts file is a merged collection of hosts from reputable sources",
-          "prefix": "0.0.0.0 ",
-          "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
-        },
-        "sysctl.org": {
-          "disabled": "false",
-          "description": "This hosts file is a merged collection of hosts from cameleon",
-          "ip": "172.16.16.1",
-          "prefix": "127.0.0.1\t ",
-          "url": "http://sysctl.org/cameleon/hosts",
-        },
-        "tasty": {
-          "disabled": "false",
-          "description": "File source",
-          "ip": "10.10.10.10",
-          "file": "../internal/testdata/blist.hosts.src",
-        },
-        "volkerschatz": {
-          "disabled": "false",
-          "description": "Ad server blacklists",
-          "prefix": "http",
-          "url": "http://www.volkerschatz.com/net/adpaths",
-        },
-        "yoyo": {
-          "disabled": "false",
-          "description": "Fully Qualified Domain Names only - no prefix to strip",
-          "url": "https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=1&mimetype=plaintext",
+          "description": "HaGeZi DNS Blocklists — Pro (dnsmasq)",
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt",
         }
     }]
     }
@@ -771,7 +643,7 @@ system {
 }`
 
 	// JSONrawcfg is JSON unformatted blacklist configuration output
-	JSONrawcfg = `{"blacklist":{"data":{},"disable":false,"excludes":["122.2o7.net","1e100.net","adobedtm.com","akamai.net","amazon.com","amazonaws.com","apple.com","ask.com","avast.com","bitdefender.com","cdn.visiblemeasures.com","cloudfront.net","coremetrics.com","edgesuite.net","freedns.afraid.org","github.com","githubusercontent.com","google.com","googleadservices.com","googleapis.com","googleusercontent.com","gstatic.com","gvt1.com","gvt1.net","hb.disney.go.com","hp.com","hulu.com","images-amazon.com","msdn.com","paypal.com","rackcdn.com","schema.org","skype.com","smacargo.com","sourceforge.net","ssl-on9.com","ssl-on9.net","static.chartbeat.com","storage.googleapis.com","windows.net","yimg.com","ytimg.com"],"includes":[],"ip":"0.0.0.0"},"domains":{"data":{"malc0de":{"desc":"List of zones serving malicious executables observed by malc0de.com/database/","disabled":false,"file":"","ip":"","name":"malc0de","prefix":"zone ","type":2,"url":"http://malc0de.com/bl/ZONES"}},"disable":false,"excludes":[],"includes":["adsrvr.org","adtechus.net","advertising.com","centade.com","doubleclick.net","free-counter.co.uk","intellitxt.com","kiosked.com"],"ip":"0.0.0.0"},"hosts":{"data":{"adaway":{"desc":"Blocking mobile ad providers and some analytics providers","disabled":false,"file":"","ip":"","name":"adaway","prefix":"127.0.0.1 ","type":3,"url":"http://adaway.org/hosts.txt"},"malwaredomainlist":{"desc":"127.0.0.1 based host and domain list","disabled":false,"file":"","ip":"","name":"malwaredomainlist","prefix":"127.0.0.1 ","type":3,"url":"http://www.malwaredomainlist.com/hostslist/hosts.txt"},"openphish":{"desc":"OpenPhish automatic phishing detection","disabled":false,"file":"","ip":"","name":"openphish","prefix":"http","type":3,"url":"https://openphish.com/feed.txt"},"someonewhocares":{"desc":"Zero based host and domain list","disabled":false,"file":"","ip":"","name":"someonewhocares","prefix":"0.0.0.0","type":3,"url":"http://someonewhocares.org/hosts/zero/"},"tasty":{"desc":"File source","disabled":false,"file":"../internal/testdata/blist.hosts.src","ip":"0.0.0.0","name":"tasty","prefix":"","type":3,"url":""},"volkerschatz":{"desc":"Ad server blacklists","disabled":false,"file":"","ip":"","name":"volkerschatz","prefix":"http","type":3,"url":"http://www.volkerschatz.com/net/adpaths"},"winhelp2002":{"desc":"Zero based host and domain list","disabled":false,"file":"","ip":"0.0.0.0","name":"winhelp2002","prefix":"0.0.0.0 ","type":3,"url":"http://winhelp2002.mvps.org/hosts.txt"},"yoyo":{"desc":"Fully Qualified Domain Names only - no prefix to strip","disabled":false,"file":"","ip":"","name":"yoyo","prefix":"","type":3,"url":"http://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml\u0026showintro=1\u0026mimetype=plaintext"}},"disable":false,"excludes":[],"includes":["beap.gemini.yahoo.com"],"ip":"192.168.168.1"}}`
+	JSONrawcfg = `{"blacklist":{"data":{},"disable":false,"excludes":["122.2o7.net","1e100.net","adobedtm.com","akamai.net","amazon.com","amazonaws.com","apple.com","ask.com","avast.com","bitdefender.com","cdn.visiblemeasures.com","cloudfront.net","coremetrics.com","edgesuite.net","freedns.afraid.org","github.com","githubusercontent.com","google.com","googleadservices.com","googleapis.com","googleusercontent.com","gstatic.com","gvt1.com","gvt1.net","hb.disney.go.com","hp.com","hulu.com","images-amazon.com","msdn.com","paypal.com","rackcdn.com","schema.org","skype.com","smacargo.com","sourceforge.net","ssl-on9.com","ssl-on9.net","static.chartbeat.com","storage.googleapis.com","windows.net","yimg.com","ytimg.com"],"includes":[],"ip":"0.0.0.0"},"domains":{"data":{"malc0de":{"desc":"List of zones serving malicious executables observed by malc0de.com/database/","disabled":false,"file":"","ip":"","name":"malc0de","prefix":"zone ","type":2,"url":"http://malc0de.com/bl/ZONES"}},"disable":false,"excludes":[],"includes":[],"ip":"0.0.0.0"},"hosts":{"data":{"adaway":{"desc":"Blocking mobile ad providers and some analytics providers","disabled":false,"file":"","ip":"","name":"adaway","prefix":"127.0.0.1 ","type":3,"url":"http://adaway.org/hosts.txt"},"malwaredomainlist":{"desc":"127.0.0.1 based host and domain list","disabled":false,"file":"","ip":"","name":"malwaredomainlist","prefix":"127.0.0.1 ","type":3,"url":"http://www.malwaredomainlist.com/hostslist/hosts.txt"},"openphish":{"desc":"OpenPhish automatic phishing detection","disabled":false,"file":"","ip":"","name":"openphish","prefix":"http","type":3,"url":"https://openphish.com/feed.txt"},"someonewhocares":{"desc":"Zero based host and domain list","disabled":false,"file":"","ip":"","name":"someonewhocares","prefix":"0.0.0.0","type":3,"url":"http://someonewhocares.org/hosts/zero/"},"tasty":{"desc":"File source","disabled":false,"file":"../../internal/testdata/blist.hosts.src","ip":"0.0.0.0","name":"tasty","prefix":"","type":3,"url":""},"volkerschatz":{"desc":"Ad server blacklists","disabled":false,"file":"","ip":"","name":"volkerschatz","prefix":"http","type":3,"url":"http://www.volkerschatz.com/net/adpaths"},"winhelp2002":{"desc":"Zero based host and domain list","disabled":false,"file":"","ip":"0.0.0.0","name":"winhelp2002","prefix":"0.0.0.0 ","type":3,"url":"http://winhelp2002.mvps.org/hosts.txt"},"yoyo":{"desc":"Fully Qualified Domain Names only - no prefix to strip","disabled":false,"file":"","ip":"","name":"yoyo","prefix":"","type":3,"url":"http://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml\u0026showintro=1\u0026mimetype=plaintext"}},"disable":false,"excludes":[],"includes":["beap.gemini.yahoo.com"],"ip":"192.168.168.1"}}`
 
 	// JSONcfgZeroHostSources is JSON formatted blacklist configuration output with zero sources for hosts
 	JSONcfgZeroHostSources = `{
@@ -829,16 +701,7 @@ system {
     "domains": {
       "disabled": "false",
       "excludes": [],
-      "includes": [
-        "adsrvr.org",
-        "adtechus.net",
-        "advertising.com",
-        "centade.com",
-        "doubleclick.net",
-        "free-counter.co.uk",
-        "intellitxt.com",
-        "kiosked.com"
-        ],
+      "includes": [],
       "sources": [{
         "malc0de": {
           "disabled": "false",
@@ -905,32 +768,10 @@ system {
         disabled false
         dns-redirect-ip 192.168.168.1
         domains {
-            source NoBitCoin {
-                description "Blocking Web Browser Bitcoin Mining"
-                prefix 0.0.0.0
-                url https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
-            }
-            source malc0de {
-                description "List of zones serving malicious executables observed by malc0de.com/database/"
-                prefix zone
-                url http://malc0de.com/bl/ZONES
-            }
-            source malwaredomains.com {
-                description "Just Domains"
-                url http://mirror1.malwaredomains.com/files/justdomains
-            }
-            source simple_tracking {
-                description "Basic tracking list by Disconnect"
-                url https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
-            }
-            source zeus {
-                description "abuse.ch ZeuS domain blocklist"
-                url https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist
-            }
-        source tasty {
-            description "File source"
-            dns-redirect-ip 10.10.10.10
-            file ./internal/testdata/blist.hosts.src
+            source tasty {
+                description "File source"
+                dns-redirect-ip 10.10.10.10
+                file ../../internal/testdata/blist.hosts.src
             }
         }
         exclude 1e100.net
@@ -1008,43 +849,12 @@ system {
         exclude xboxlive.com
         exclude yimg.com
         exclude ytimg.com
-        include adk2x.com
-        include adsrvr.org
-        include adtechus.net
-        include advertising.com
-        include centade.com
-        include doubleclick.net
-        include fastplayz.com
-        include free-counter.co.uk
-        include hilltopads.net
-        include intellitxt.com
-        include kiosked.com
-        include patoghee.in
-        include themillionaireinpjs.com
-        include traktrafficflow.com
-        include wwwpromoter.com
         hosts {
-            include ads.feedly.com
             include beap.gemini.yahoo.com
-            source githubSteveBlack {
-                description "Blacklists adware and malware websites"
-                prefix 0.0.0.0
-                url https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-            }
-            source hostsfile.org {
-                description "hostsfile.org bad hosts blacklist"
-                prefix 127.0.0.1
-                url http://www.hostsfile.org/Downloads/hosts.txt
-            }
-            source openphish {
-                description "OpenPhish automatic phishing detection"
-                prefix http
-                url https://openphish.com/feed.txt
-            }
-            source sysctl.org {
-                description "This hosts file is a merged collection of hosts from Cameleon"
-                prefix 127.0.0.1
-                url http://sysctl.org/cameleon/hosts
+            source hageziPro {
+                description "HaGeZi DNS Blocklists — Pro (dnsmasq)"
+                prefix ""
+                url https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt
             }
         }
     }`
@@ -1214,7 +1024,7 @@ system {
         }
     }
     task-scheduler {
-        task update_blacklists {
+        task update_edgeos_adblock {
             executable {
                 path /config/scripts/update-dnsmasq
             }

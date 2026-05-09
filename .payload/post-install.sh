@@ -1,7 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/vbash
 
-# Set up the Vyatta environment
+# Set up the Vyatta environment (see AGENTS.md — transactional CLI only, never raw config files)
 declare -i DEC
+source /opt/vyatta/etc/functions/script-template
 API=/bin/cli-shell-api
 CFGRUN=/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper
 shopt -s expand_aliases
@@ -128,8 +129,8 @@ update_dns_config() {
 	try set service dns forwarding blacklist domains source NoBitCoin description '"Blocking Web Browser Bitcoin Mining"'
 	try set service dns forwarding blacklist domains source NoBitCoin prefix '0.0.0.0'
 	try set service dns forwarding blacklist domains source NoBitCoin url 'https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt'
-	try set service dns forwarding blacklist domains source OISD description '"OISD Domains Basic"'
-	try set service dns forwarding blacklist domains source OISD url 'https://dbl.oisd.nl/basic/'
+	try set service dns forwarding blacklist domains source OISD description '"OISD Domains Small"'
+	try set service dns forwarding blacklist domains source OISD url 'https://small.oisd.nl/domainswild2'
 	try set service dns forwarding blacklist domains source simple_tracking description '"Basic tracking list by Disconnect"'
 	try set service dns forwarding blacklist domains source simple_tracking url 'https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt'
 	try set service dns forwarding blacklist exclude 1e100.net
@@ -232,19 +233,24 @@ update_dns_config() {
 	try set service dns forwarding blacklist exclude yimg.com
 	try set service dns forwarding blacklist exclude ytimg.com
 	try set service dns forwarding blacklist hosts exclude cfvod.kaltura.com
-	try set service dns forwarding blacklist hosts include ads.feedly.com
 	try set service dns forwarding blacklist hosts include beap.gemini.yahoo.com
-	# try set service dns forwarding blacklist hosts source githubSteveBlack description '"Blacklists adware and malware websites"'
-	# try set service dns forwarding blacklist hosts source githubSteveBlack prefix '0.0.0.0 '
-	# try set service dns forwarding blacklist hosts source githubSteveBlack url 'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts'
-	try set service dns forwarding blacklist hosts source openphish description '"OpenPhish automatic phishing detection"'
-	try set service dns forwarding blacklist hosts source openphish prefix 'http'
-	try set service dns forwarding blacklist hosts source openphish url 'https://openphish.com/feed.txt'
-	try set system task-scheduler task update_blacklists executable arguments 10800
-	try set system task-scheduler task update_blacklists executable path /config/scripts/update-dnsmasq-cronjob.sh
-	try set system task-scheduler task update_blacklists interval 1d
-	try commit
-	try save
+	# HaGeZi Pro (dnsmasq/pro.txt); Vyatta hosts source tag hageziPro.
+	try set service dns forwarding blacklist hosts source hageziPro description '"HaGeZi DNS Blocklists — Pro (dnsmasq)"'
+	try set service dns forwarding blacklist hosts source hageziPro prefix ''
+	try set service dns forwarding blacklist hosts source hageziPro url 'https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt'
+	try set system task-scheduler task update_edgeos_adblock executable arguments 10800
+	try set system task-scheduler task update_edgeos_adblock executable path /config/scripts/update-dnsmasq-cronjob.sh
+	try set system task-scheduler task update_edgeos_adblock interval 1d
+	try commit || {
+		echo_logger FE "Configuration commit failed — aborting post-install"
+		try end 2>/dev/null || true
+		exit 1
+	}
+	try save || {
+		echo_logger FE "Configuration save failed — aborting post-install"
+		try end 2>/dev/null || true
+		exit 1
+	}
 	try end
 }
 
@@ -260,6 +266,6 @@ noblacklist && UPGRADE=1
 
 # Only run the post installation script if this is a first time installation
 if [[ ${UPGRADE} == 1 ]] ; then
-	echo "Installing blacklist configuration settings..."
+	echo "Installing edgeos-adblock configuration settings..."
 	update_dns_config
 fi

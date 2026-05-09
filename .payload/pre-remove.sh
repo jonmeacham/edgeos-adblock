@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/vbash
 
-# Set up the Vyatta environment
+# Set up the Vyatta environment (see AGENTS.md — transactional CLI only, never raw config files)
 declare -i DEC
-# source /opt/vyatta/etc/functions/script-template
+source /opt/vyatta/etc/functions/script-template
 API=/bin/cli-shell-api
 CFGRUN=/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper
 DATE=$(date +'%FT%H%M%S')
@@ -112,7 +112,7 @@ isblacklist() {
 # Back up [service dns forwarding blacklist]
 backup_dns_config() {
 	if isblacklist; then
-		file="/config/user-data/blacklist.${DATE}.cmds"
+		file="/config/user-data/edgeos-adblock.${DATE}.cmds"
 		echo_logger I "Backing up blacklist configuration to: ${file}"
 		echo "edit service dns forwarding" > ${file} 
 		${API} showConfig service dns forwarding blacklist \
@@ -125,16 +125,24 @@ backup_dns_config() {
 # Delete the [service dns forwarding blacklist] configuration
 delete_dns_config() {
 	try begin
-	try delete system task-scheduler task update_blacklists
+	try delete system task-scheduler task update_edgeos_adblock
 	try delete service dns forwarding blacklist
-	try commit
-	try save
+	try commit || {
+		echo_logger FE "Configuration commit failed — aborting pre-remove"
+		try end 2>/dev/null || true
+		exit 1
+	}
+	try save || {
+		echo_logger FE "Configuration save failed — aborting pre-remove"
+		try end 2>/dev/null || true
+		exit 1
+	}
 	try end
 }
 
 # Remove dnsmasq configuration files
 delete_dnsmasq_config() {
-	rm -f /etc/dnsmasq.d/*blacklist.conf
+	rm -f /etc/dnsmasq.d/*edgeos-adblock.conf
 }
 
 restart_dnsmasq() {
@@ -152,7 +160,7 @@ backup_dns_config
 
 # Only run the pre-installation script if this is a first time installation
 if [[ "${1}" == "remove" ]] ; then
-	echo "Deleting blacklist configuration settings..."
+	echo "Deleting edgeos-adblock configuration settings..."
 	delete_dns_config
 	delete_dnsmasq_config
 fi

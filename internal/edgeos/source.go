@@ -10,7 +10,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/britannic/blacklist/internal/regx"
+	"github.com/jonmeacham/edgeos-adblock/internal/regx"
 )
 
 // source struct for normalizing EdgeOS data.
@@ -116,6 +116,27 @@ func pad(s string) string {
 	return fmt.Sprintf("%s %-*s", s, 13-len(s), " ")
 }
 
+// dnsmasqBlockedDomain extracts a blocked domain from HaGeZi dnsmasq-format lines
+// (local=/example.com/) or generic address=/example.com/0.0.0.0 lines.
+func dnsmasqBlockedDomain(line []byte) ([]byte, bool) {
+	line = bytes.TrimSpace(line)
+	switch {
+	case bytes.HasPrefix(line, []byte("local=/")):
+		rest := bytes.TrimPrefix(line, []byte("local=/"))
+		rest = bytes.TrimSuffix(rest, []byte("/"))
+		if len(rest) == 0 {
+			return nil, false
+		}
+		return rest, true
+	case bytes.HasPrefix(line, []byte("address=/")):
+		parts := bytes.Split(line, []byte("/"))
+		if len(parts) >= 3 && len(parts[1]) > 0 {
+			return parts[1], true
+		}
+	}
+	return nil, false
+}
+
 // Process extracts hosts/domains from downloaded raw content
 func (s *source) process() *bList {
 	var (
@@ -133,6 +154,26 @@ func (s *source) process() *bList {
 		switch {
 		case bytes.HasPrefix(line, []byte("#")), bytes.HasPrefix(line, []byte("//")), bytes.HasPrefix(line, []byte("<")):
 			continue
+		}
+		if dom, ok := dnsmasqBlockedDomain(line); ok {
+			for _, fqdn := range find.RX[regx.FQDN].FindAll(dom, -1) {
+				extracted++
+				if s.Dex.subKeyExists(fqdn) {
+					dropped++
+					continue
+				}
+				if !s.Exc.keyExists(fqdn) {
+					kept++
+					s.Exc.set(fqdn)
+					l.set(fqdn)
+					continue
+				}
+				dropped++
+			}
+			continue
+		}
+
+		switch {
 		case bytes.HasPrefix(line, []byte(s.prefix)):
 			if line, ok = find.StripPrefixAndSuffix(line, s.prefix); ok {
 				for _, fqdn := range find.RX[regx.FQDN].FindAll(line, -1) {

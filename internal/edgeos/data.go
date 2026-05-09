@@ -89,7 +89,7 @@ func getDnsmasqPrefix(s *source) string {
 }
 
 // getType returns the converted "in" type
-func getType(in interface{}) (out interface{}) {
+func getType(in any) (out any) {
 	switch in := in.(type) {
 	case ntype:
 		out = typeInt(in)

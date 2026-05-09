@@ -1,110 +1,122 @@
 package edgeos
 
 import (
+	"reflect"
 	"sort"
 	"testing"
 
-	"github.com/britannic/blacklist/internal/tdata"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/jonmeacham/edgeos-adblock/internal/tdata"
 )
 
 func TestObjectsAddObj(t *testing.T) {
-	Convey("Testing ObjectsAddObj()", t, func() {
-		c := NewConfig(
-			Dir("/tmp"),
-			Ext("blacklist.conf"),
-		)
+	c := NewConfig(
+		Dir("/tmp"),
+		Ext("edgeos-adblock.conf"),
+	)
 
-		So(c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}), ShouldBeNil)
+	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+		t.Fatal(err)
+	}
 
-		o, err := c.NewContent(FileObj)
-		So(err, ShouldBeNil)
+	o, err := c.NewContent(FileObj)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		exp := o
+	exp := o
 
-		o.GetList().addObj(c, rootNode)
+	o.GetList().addObj(c, rootNode)
 
-		So(o, ShouldResemble, exp)
-	})
+	if !reflect.DeepEqual(o, exp) {
+		t.Errorf("addObj: got %+v, want %+v", o, exp)
+	}
 }
 
 func TestObjectString(t *testing.T) {
-	Convey("Testing ObjectString()", t, func() {
-		c := NewConfig(
-			Dir("/tmp"),
-			Ext("blacklist.conf"),
-		)
+	c := NewConfig(
+		Dir("/tmp"),
+		Ext("edgeos-adblock.conf"),
+	)
 
-		So(c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}), ShouldBeNil)
+	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+		t.Fatal(err)
+	}
 
-		act := c.GetAll()
-		So(act.Find("sysctl.org"), ShouldEqual, 9)
-		So(act.Find("@#$%"), ShouldEqual, -1)
-	})
+	act := c.GetAll()
+	if act.Find("hageziPro") < 0 {
+		t.Errorf("Find(hageziPro): expected configured URL source")
+	}
+	if got, want := act.Find("@#$%"), -1; got != want {
+		t.Errorf("Find: got %d, want %d", got, want)
+	}
 }
 
 func TestSortObject(t *testing.T) {
-	Convey("Testing SortObject()", t, func() {
-		act := &Objects{
-			src: []*source{
-				{name: "eagle"},
-				{name: "aardvark"},
-				{name: "dog"},
-				{name: "crab"},
-				{name: "beetle"},
-			},
-		}
+	act := &Objects{
+		src: []*source{
+			{name: "eagle"},
+			{name: "aardvark"},
+			{name: "dog"},
+			{name: "crab"},
+			{name: "beetle"},
+		},
+	}
 
-		exp := &Objects{
-			src: []*source{
-				{name: "aardvark"},
-				{name: "beetle"},
-				{name: "crab"},
-				{name: "dog"},
-				{name: "eagle"},
-			},
-		}
+	exp := &Objects{
+		src: []*source{
+			{name: "aardvark"},
+			{name: "beetle"},
+			{name: "crab"},
+			{name: "dog"},
+			{name: "eagle"},
+		},
+	}
 
-		sort.Sort(act)
-		So(act, ShouldResemble, exp)
-	})
+	sort.Sort(act)
+	if !reflect.DeepEqual(act, exp) {
+		t.Errorf("sort: got %+v, want %+v", act, exp)
+	}
 }
 
 func TestFilter(t *testing.T) {
-	Convey("Testing SortObject()", t, func() {
-		tests := []struct {
-			ltype string
-			exp   sort.StringSlice
-		}{
-			{ltype: urls, exp: urlsOnly},
-			{ltype: files, exp: filesOnly},
-			{ltype: hosts, exp: sort.StringSlice(nil)},
-		}
+	tests := []struct {
+		ltype string
+		exp   sort.StringSlice
+	}{
+		{ltype: urls, exp: urlsOnly},
+		{ltype: files, exp: filesOnly},
+		{ltype: hosts, exp: sort.StringSlice(nil)},
+	}
 
-		c := NewConfig(
-			Dir("/tmp"),
-			Ext("blacklist.conf"),
-		)
+	c := NewConfig(
+		Dir("/tmp"),
+		Ext("edgeos-adblock.conf"),
+	)
 
-		So(c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}), ShouldBeNil)
+	if err := c.Blacklist(&CFGstatic{Cfg: tdata.Cfg}); err != nil {
+		t.Fatal(err)
+	}
 
-		for _, tt := range tests {
-			Convey("Testing "+tt.ltype, func() {
-				act := c.GetAll().Filter(tt.ltype)
-				So(act.Names(), ShouldResemble, tt.exp)
-			})
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.ltype, func(t *testing.T) {
+			act := c.GetAll().Filter(tt.ltype)
+			if !reflect.DeepEqual(act.Names(), tt.exp) {
+				t.Errorf("Names(): got %#v, want %#v", act.Names(), tt.exp)
+			}
+		})
+	}
 }
 
 func TestGetLtypeDesc(t *testing.T) {
-	Convey("Testing getLtypeDesc()", t, func() {
-		So(getLtypeDesc(""), ShouldEqual, "pre-configured unknown ltype")
-		So(getLtypeDesc("Hyperbolic-frisbee-throwers"), ShouldEqual, "pre-configured Hyperbolic frisbee throwers")
-	})
+	if got, want := getLtypeDesc(""), "pre-configured unknown ltype"; got != want {
+		t.Errorf("getLtypeDesc(\"\"): got %q, want %q", got, want)
+	}
+	if got, want := getLtypeDesc("Hyperbolic-frisbee-throwers"), "pre-configured Hyperbolic frisbee throwers"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
 }
 
 var (
 	filesOnly = sort.StringSlice{"tasty"}
-	urlsOnly  = sort.StringSlice{"malc0de", "malwaredomains.com", "openphish", "raw.github.com", "simple_tracking", "sysctl.org", "volkerschatz", "yoyo", "zeus"}
+	urlsOnly  = sort.StringSlice{"hageziPro"}
 )

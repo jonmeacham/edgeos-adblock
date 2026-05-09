@@ -1,40 +1,41 @@
 package edgeos
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"runtime"
 	"sync"
 	"time"
-
-	logging "github.com/britannic/go-logging"
 )
 
 // Env is struct of parameters
 type Env struct {
 	ctr
-	// ioWriter io.Writer
-	Log      *logging.Logger
-	API      string        `json:"API,omitempty"`
-	Arch     string        `json:"Arch,omitempty"`
-	Bash     string        `json:"Bash,omitempty"`
-	Cores    int           `json:"Cores,omitempty"`
-	Disabled bool          `json:"Disabled"`
-	Dbug     bool          `json:"Dbug,omitempty"`
-	Dex      *list         `json:"Dex,omitempty"`
-	Dir      string        `json:"Dir,omitempty"`
-	DNSsvc   string        `json:"dnsmasq service,omitempty"`
-	Exc      *list         `json:"Exc,omitempty"`
-	Ext      string        `json:"dnsmasq fileExt.,omitempty"`
-	File     string        `json:"File,omitempty"`
-	FnFmt    string        `json:"File name fmt,omitempty"`
-	InCLI    string        `json:"-"`
-	Method   string        `json:"HTTP method,omitempty"`
-	Pfx      dnsPfx        `json:"Prefix,omitempty"`
-	Test     bool          `json:"Test,omitempty"`
-	Timeout  time.Duration `json:"Timeout,omitempty"`
-	Verb     bool          `json:"Verbosity,omitempty"`
-	Wildcard/*..........*/ `json:"Wildcard,omitempty"`
+	Log      Logger          `json:"-"`
+	HTTPCtx  context.Context `json:"-"`
+	HTTP     *http.Client    `json:"-"`
+	API      string          `json:"API,omitempty"`
+	Arch     string          `json:"Arch,omitempty"`
+	Bash     string          `json:"Bash,omitempty"`
+	Cores    int             `json:"Cores,omitempty"`
+	Disabled bool            `json:"Disabled"`
+	Dbug     bool            `json:"Dbug,omitempty"`
+	Dex      *list           `json:"Dex,omitempty"`
+	Dir      string          `json:"Dir,omitempty"`
+	DNSsvc   string          `json:"dnsmasq service,omitempty"`
+	Exc      *list           `json:"Exc,omitempty"`
+	Ext      string          `json:"dnsmasq fileExt.,omitempty"`
+	File     string          `json:"File,omitempty"`
+	FnFmt    string          `json:"File name fmt,omitempty"`
+	InCLI    string          `json:"-"`
+	Method   string          `json:"HTTP method,omitempty"`
+	Pfx      dnsPfx          `json:"Prefix"`
+	Test     bool            `json:"Test,omitempty"`
+	Timeout  time.Duration   `json:"Timeout,omitempty"`
+	Verb     bool            `json:"Verbosity,omitempty"`
+	Wildcard Wildcard        `json:"Wildcard"`
 }
 
 // dnsPfx defines the prefix entries in the dnsmasq configuration file
@@ -50,10 +51,11 @@ type Wildcard struct {
 }
 
 // Debug logs debug messages when the Dbug flag is true
-func (e *Env) Debug(s ...interface{}) {
-	if e.Dbug {
-		e.Log.Debug(s...)
+func (e *Env) Debug(s ...any) {
+	if !e.Dbug || e.Log == nil {
+		return
 	}
+	e.Log.Debug(s...)
 }
 
 // Option is a recursive function
@@ -184,12 +186,30 @@ func InCLI(s string) Option {
 	}
 }
 
-// Logger sets a pointer to the logger
-func Logger(l *logging.Logger) Option {
+// SetLogger wires the logger implementation (typically slog-backed from main).
+func SetLogger(l Logger) Option {
 	return func(c *Config) Option {
 		previous := c.Log
 		c.Log = l
-		return Logger(previous)
+		return SetLogger(previous)
+	}
+}
+
+// Context sets the parent context for outbound HTTP downloads (timeouts stack with request timeout).
+func Context(ctx context.Context) Option {
+	return func(c *Config) Option {
+		previous := c.HTTPCtx
+		c.HTTPCtx = ctx
+		return Context(previous)
+	}
+}
+
+// HTTPClient sets the HTTP client for downloads (nil uses [defaultHTTPClient]).
+func HTTPClient(client *http.Client) Option {
+	return func(c *Config) Option {
+		previous := c.HTTP
+		c.HTTP = client
+		return HTTPClient(previous)
 	}
 }
 

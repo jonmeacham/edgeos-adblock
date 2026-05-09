@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"sync"
 	"testing"
-
-	. "github.com/smartystreets/goconvey/convey"
 )
 
 type HTTPserver struct {
@@ -25,57 +24,72 @@ func (h *HTTPserver) NewHTTPServer() *url.URL {
 }
 
 func TestGetHTTP(t *testing.T) {
-	Convey("Testing GetHTTP()", t, func() {
-		var (
-			h      = new(HTTPserver)
-			method = "GET"
-			page   = "/domains.txt"
-			// want   = HTTPDomainData
+	var (
+		h      = new(HTTPserver)
+		method = "GET"
+		page   = "/domains.txt"
+	)
+
+	tests := []struct {
+		err     error
+		method  string
+		ok      bool
+		URL     string
+		exp     string
+		want404 bool
+	}{
+		{ok: true, err: nil, method: method, URL: page},
+		{ok: false, err: fmt.Errorf("%v", `Get "bad%20url": unsupported protocol scheme ""`), method: method, URL: "bad url"},
+		{ok: false, err: fmt.Errorf("%v", `net/http: invalid method "bad method"`), method: "bad method", URL: page},
+		{ok: false, err: fmt.Errorf("%v", `Get "http://127.0.0.1:808/": dial tcp 127.0.0.1:808: connect: connection refused`), method: method, URL: "http://127.0.0.1:808/"},
+		{ok: true, err: nil, method: method, URL: page},
+		{ok: true, err: nil, method: method, URL: "/biccies.txt", want404: true},
+		{ok: true, err: fmt.Errorf("%v", `net/http: invalid method "bad method"`), method: "bad method", URL: page},
+	}
+
+	for i, tt := range tests {
+		URL := h.NewHTTPServer().String()
+		h.Mux.HandleFunc(page,
+			func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprint(w, tt.exp)
+			},
 		)
 
-		tests := []struct {
-			err    error
-			method string
-			ok     bool
-			URL    string
-			exp    string
-		}{
-			{ok: true, err: nil, method: method, URL: page},
-			{ok: false, err: fmt.Errorf("%v", `Get "bad%20url": unsupported protocol scheme ""`), method: method, URL: "bad url"},
-			{ok: false, err: fmt.Errorf("%v", `net/http: invalid method "bad method"`), method: "bad method", URL: page},
-			{ok: false, err: fmt.Errorf("%v", `Get "http://127.0.0.1:808/": dial tcp 127.0.0.1:808: connect: connection refused`), method: method, URL: "http://127.0.0.1:808/"},
-			{ok: true, err: nil, method: method, URL: page},
-			{ok: true, err: nil, method: method, URL: "/biccies.txt", exp: "404 page not found\n"},
-			{ok: true, err: fmt.Errorf("%v", `net/http: invalid method "bad method"`), method: "bad method", URL: page},
+		tURL := tt.URL
+		if tt.ok {
+			tURL = URL + tt.URL
 		}
 
-		for i, tt := range tests {
-			URL := h.NewHTTPServer().String()
-			h.Mux.HandleFunc(page,
-				func(w http.ResponseWriter, r *http.Request) {
-					fmt.Fprint(w, tt.exp)
-				},
-			)
+		o := download(&source{Env: &Env{Log: newLog(), Method: tt.method}, url: tURL})
 
-			if tt.ok {
-				tt.URL = URL + tt.URL
+		if tt.want404 {
+			if o.err == nil {
+				t.Fatalf("case %d: want error", i)
 			}
-
-			o := download(&source{Env: &Env{Log: newLog(), Method: tt.method}, url: tt.URL})
-
-			switch {
-			case o.err != nil && tt.err != nil:
-				So(o.err.Error(), ShouldResemble, tt.err.Error())
-			case o.err != nil:
-				fmt.Printf("Test: %v, error: %v\n", i, o.err)
+			if !strings.Contains(o.err.Error(), "unexpected HTTP status") {
+				t.Fatalf("case %d: got %v", i, o.err)
 			}
-
-			act, err := io.ReadAll(o.r)
-			So(err, ShouldBeNil)
-
-			So(string(act), ShouldEqual, tt.exp)
+			continue
 		}
-	})
+
+		switch {
+		case o.err != nil && tt.err != nil:
+			if o.err.Error() != tt.err.Error() {
+				t.Errorf("case %d: got %v want %v", i, o.err, tt.err)
+			}
+		case o.err != nil:
+			t.Logf("case %d: error: %v", i, o.err)
+		}
+
+		act, err := io.ReadAll(o.r)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if string(act) != tt.exp {
+			t.Errorf("case %d: body %q want %q", i, act, tt.exp)
+		}
+	}
 }
 
 type myHandler struct {
@@ -93,21 +107,55 @@ func (h *myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestMyHandler(t *testing.T) {
-	Convey("Testing MyHandler()", t, func() {
-		server := httptest.NewServer(&myHandler{})
-		defer server.Close()
+	server := httptest.NewServer(&myHandler{})
+	defer server.Close()
 
-		for _, i := range []int{1, 2} {
-			resp, err := http.Get(server.URL)
-			So(err, ShouldBeNil)
-			So(resp.StatusCode, ShouldEqual, 200)
-
-			exp := fmt.Sprintf("Visitor count: %d.", i)
-			act, err := io.ReadAll(resp.Body)
-			So(err, ShouldBeNil)
-			So(string(act), ShouldEqual, exp)
+	for _, i := range []int{1, 2} {
+		resp, err := http.Get(server.URL)
+		if err != nil {
+			t.Fatal(err)
 		}
+		if resp.StatusCode != 200 {
+			t.Fatalf("status %d", resp.StatusCode)
+		}
+
+		exp := fmt.Sprintf("Visitor count: %d.", i)
+		act, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(act) != exp {
+			t.Fatalf("got %q want %q", act, exp)
+		}
+	}
+}
+
+func TestDownloadUsesInjectedHTTPClient(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "injected-ok")
+	}))
+	defer srv.Close()
+
+	cli := srv.Client()
+	o := download(&source{
+		Env: &Env{
+			Log:    newLog(),
+			Method: "GET",
+			HTTP:   cli,
+		},
+		url: srv.URL,
 	})
+	if o.err != nil {
+		t.Fatal(o.err)
+	}
+	b, err := io.ReadAll(o.r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(b) != "injected-ok" {
+		t.Fatalf("body %q", b)
+	}
 }
 
 var (

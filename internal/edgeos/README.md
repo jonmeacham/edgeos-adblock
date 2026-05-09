@@ -1,7 +1,7 @@
 # edgeos
 
 --
-    import "github.com/britannic/blacklist/internal/edgeos"
+    import "github.com/jonmeacham/edgeos-adblock/internal/edgeos"
 
 Package edgeos provides methods and structures to retrieve, parse and render
 EdgeOS configuration data and files.

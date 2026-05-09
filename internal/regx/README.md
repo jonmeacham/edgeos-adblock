@@ -1,6 +1,6 @@
 # regx
 --
-    import "github.com/britannic/blacklist/internal/regx"
+    import "github.com/jonmeacham/edgeos-adblock/internal/regx"
 
 Package regx provides regex objects for processing data in files and web content
 

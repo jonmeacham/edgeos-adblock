@@ -1,0 +1,14 @@
+.git
+vendor
+.payload
+docs
+.github
+.env
+*.deb
+*.prof
+*.pprof
+*.gif
+*.png
+coverage.txt
+**/cpu.*.prof
+**/mem.*.prof

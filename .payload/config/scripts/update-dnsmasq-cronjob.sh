@@ -1,4 +1,5 @@
 #!/bin/bash
+# See repo AGENTS.md: this wrapper does not modify Vyatta configuration (sleep + exec only).
 # Cron script runs update-dnsmasq at random times within a 3 hour window
 # Since cron will run this script, we have to escape the modulus operator, 
 # otherwise cron will interpret it as a newline.

@@ -13,7 +13,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/britannic/blacklist/internal/regx"
+	"github.com/jonmeacham/edgeos-adblock/internal/regx"
 )
 
 // tree is a map of top node Objects
@@ -74,6 +74,9 @@ const (
 	// True is a string constant
 	True = "true"
 )
+
+// ErrNoBlacklistCfg is returned when no blacklist configuration tree was parsed.
+var ErrNoBlacklistCfg = errors.New("no EdgeOS dns forwarding blacklist configuration")
 
 func (c *Config) nodeExists(n string) bool {
 	_, ok := c.tree[n]
@@ -272,12 +275,12 @@ func (c *Config) excinc(t [][]byte, n string) {
 	switch string(t[1]) {
 	case "exclude":
 		if isTnode(n) {
-			c.Debug("Whitelisting %s on node %s", string(t[2]), n)
+			c.Debug(fmt.Sprintf("Whitelisting %s on node %s", string(t[2]), n))
 			c.tree[n].exc = append(c.tree[n].exc, string(t[2]))
 		}
 	case "include":
 		if isTnode(n) {
-			c.Debug("Blacklisting %s on node %s", string(t[2]), n)
+			c.Debug(fmt.Sprintf("Blacklisting %s on node %s", string(t[2]), n))
 			c.tree[n].inc = append(c.tree[n].inc, string(t[2]))
 		}
 	}
@@ -427,7 +430,7 @@ func (c *Config) Blacklist(r ConfLoader) error {
 	}
 
 	if len(c.tree) < 1 {
-		return errors.New("no blacklist configuration has been detected")
+		return fmt.Errorf("%w has been detected", ErrNoBlacklistCfg)
 	}
 
 	c.Debug(fmt.Sprintf("Using router configuration %v", c.String()))

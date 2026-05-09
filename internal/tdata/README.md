@@ -1,7 +1,8 @@
 # tdata
 --
-    import "github.com/britannic/blacklist/internal/tdata"
+    import "github.com/jonmeacham/edgeos-adblock/internal/tdata"
 
+Strings below mirror `tdata.go`. HaGeZi defaults use **Pro** (`dnsmasq/pro.txt`) under the EdgeOS hosts source tag **`hageziPro`**.
 
 ## Usage
 
@@ -395,7 +396,7 @@ system {
         }
     }
     task-scheduler {
-        task update_blacklists {
+        task update_edgeos_adblock {
             executable {
                 path /config/scripts/update-dnsmasq
             }
@@ -894,32 +895,10 @@ system {
         disabled false
         dns-redirect-ip 192.168.168.1
         domains {
-            source NoBitCoin {
-                description "Blocking Web Browser Bitcoin Mining"
-                prefix 0.0.0.0
-                url https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
-            }
-            source malc0de {
-                description "List of zones serving malicious executables observed by malc0de.com/database/"
-                prefix zone
-                url http://malc0de.com/bl/ZONES
-            }
-            source malwaredomains.com {
-                description "Just Domains"
-                url http://mirror1.malwaredomains.com/files/justdomains
-            }
-            source simple_tracking {
-                description "Basic tracking list by Disconnect"
-                url https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
-            }
-            source zeus {
-                description "abuse.ch ZeuS domain blocklist"
-                url https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist
-            }
-        source tasty {
-            description "File source"
-            dns-redirect-ip 10.10.10.10
-            file ./internal/testdata/blist.hosts.src
+            source tasty {
+                description "File source"
+                dns-redirect-ip 10.10.10.10
+                file ../../internal/testdata/blist.hosts.src
             }
         }
         exclude 1e100.net
@@ -997,43 +976,12 @@ system {
         exclude xboxlive.com
         exclude yimg.com
         exclude ytimg.com
-        include adk2x.com
-        include adsrvr.org
-        include adtechus.net
-        include advertising.com
-        include centade.com
-        include doubleclick.net
-        include fastplayz.com
-        include free-counter.co.uk
-        include hilltopads.net
-        include intellitxt.com
-        include kiosked.com
-        include patoghee.in
-        include themillionaireinpjs.com
-        include traktrafficflow.com
-        include wwwpromoter.com
         hosts {
-            include ads.feedly.com
             include beap.gemini.yahoo.com
-            source githubSteveBlack {
-                description "Blacklists adware and malware websites"
-                prefix 0.0.0.0
-                url https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-            }
-            source hostsfile.org {
-                description "hostsfile.org bad hosts blacklist"
-                prefix 127.0.0.1
-                url http://www.hostsfile.org/Downloads/hosts.txt
-            }
-            source openphish {
-                description "OpenPhish automatic phishing detection"
-                prefix http
-                url https://openphish.com/feed.txt
-            }
-            source sysctl.org {
-                description "This hosts file is a merged collection of hosts from Cameleon"
-                prefix 127.0.0.1
-                url http://sysctl.org/cameleon/hosts
+            source hageziPro {
+                description "HaGeZi DNS Blocklists — Pro (dnsmasq)"
+                prefix ""
+                url https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dnsmasq/pro.txt
             }
         }
     }`
@@ -1203,7 +1151,7 @@ system {
         }
     }
     task-scheduler {
-        task update_blacklists {
+        task update_edgeos_adblock {
             executable {
                 path /config/scripts/update-dnsmasq
             }

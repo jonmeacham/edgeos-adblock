@@ -2,90 +2,128 @@ package edgeos
 
 import (
 	"bytes"
-	"os"
+	"fmt"
+	"reflect"
 	"runtime"
 	"sync"
 	"testing"
 	"time"
-
-	logging "github.com/britannic/go-logging"
-	. "github.com/smartystreets/goconvey/convey"
 )
 
-func newLog() *logging.Logger {
-	scrFmt := logging.MustStringFormatter(`%{level:.4s}[%{id:03x}]: %{message}`)
-	scr := logging.NewLogBackend(os.Stdout, "", 0)
-	scrFmttr := logging.NewBackendFormatter(scr, scrFmt)
+// discardLogger implements Logger with no output (for tests that only need wiring).
+type discardLogger struct{}
 
-	logging.SetBackend(scr, scrFmttr)
+func (discardLogger) Debug(args ...any)                    {}
+func (discardLogger) Info(args ...any)                     {}
+func (discardLogger) Infof(format string, args ...any)     {}
+func (discardLogger) Warning(args ...any)                  {}
+func (discardLogger) Warningf(format string, args ...any)  {}
+func (discardLogger) Error(args ...any)                    {}
+func (discardLogger) Errorf(format string, args ...any)    {}
+func (discardLogger) Noticef(format string, args ...any)   {}
+func (discardLogger) Criticalf(format string, args ...any) {}
 
-	return logging.MustGetLogger("blacklist")
+func newLog() Logger {
+	return discardLogger{}
+}
+
+type bufLogger struct {
+	buf *bytes.Buffer
+}
+
+func (b *bufLogger) Debug(args ...any) {
+	fmt.Fprintln(b.buf, args...)
+}
+
+func (b *bufLogger) Info(args ...any) {
+	fmt.Fprintln(b.buf, args...)
+}
+
+func (b *bufLogger) Infof(format string, args ...any) {
+	fmt.Fprintf(b.buf, format+"\n", args...)
+}
+
+func (b *bufLogger) Warning(args ...any) {
+	fmt.Fprintln(b.buf, args...)
+}
+
+func (b *bufLogger) Warningf(format string, args ...any) {
+	fmt.Fprintf(b.buf, format+"\n", args...)
+}
+
+func (b *bufLogger) Error(args ...any) {
+	fmt.Fprintln(b.buf, args...)
+}
+
+func (b *bufLogger) Errorf(format string, args ...any) {
+	fmt.Fprintf(b.buf, format+"\n", args...)
+}
+
+func (b *bufLogger) Noticef(format string, args ...any) {
+	fmt.Fprintf(b.buf, format+"\n", args...)
+}
+
+func (b *bufLogger) Criticalf(format string, args ...any) {
+	fmt.Fprintf(b.buf, format+"\n", args...)
 }
 
 func TestEnvLog(t *testing.T) {
-	Convey("Testing log()", t, func() {
-		tests := []struct {
-			dbug bool
-			name string
-			str  string
-		}{
-			{name: "Info", str: "This is a log.Info test", dbug: false},
-			{name: "Debug", str: "This is a log.Debug test", dbug: true},
-			{name: "Error", str: "This is a log.Error test", dbug: true},
-			{name: "Warning", str: "This is a log.Warning test", dbug: true},
-			{name: "Not Debug", str: "This is a log.Debug test and there shouldn't be any output", dbug: false},
-		}
+	tests := []struct {
+		dbug bool
+		name string
+		str  string
+	}{
+		{name: "Info", str: "This is a log.Info test", dbug: false},
+		{name: "Debug", str: "This is a log.Debug test", dbug: true},
+		{name: "Error", str: "This is a log.Error test", dbug: true},
+		{name: "Warning", str: "This is a log.Warning test", dbug: true},
+		{name: "Not Debug", str: "This is a log.Debug test and there shouldn't be any output", dbug: false},
+	}
 
-		var (
-			scrFmt   = logging.MustStringFormatter(`%{message}`)
-			act      = &bytes.Buffer{}
-			p        = &Env{Log: logging.MustGetLogger("TestEnvLog"), Verb: true}
-			scr      = logging.NewLogBackend(act, "", 0)
-			scrFmttr = logging.NewBackendFormatter(scr, scrFmt)
-		)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			act := &bytes.Buffer{}
+			p := &Env{Log: &bufLogger{buf: act}, Verb: true}
+			p.Dbug = tt.dbug
 
-		logging.SetBackend(scrFmttr)
-
-		for _, tt := range tests {
-			Convey("Testing "+tt.name, func() {
-				p.Dbug = tt.dbug
-
-				switch {
-				case tt.dbug:
-					p.Debug(tt.str)
-					So(act.String(), ShouldEqual, tt.str+"\n")
-
-				case tt.name == "Info":
-					p.Log.Info(tt.str)
-					So(act.String(), ShouldEqual, tt.str+"\n")
-
-				case tt.name == "Warning":
-					exp := tt.str
-					exp += tt.str
-					p.Log.Warning(tt.str)
-					So(act.String(), ShouldEqual, exp)
-
-				case tt.name == "Error":
-					exp := tt.str
-					exp += tt.str
-					p.Log.Error(tt.str)
-					So(act.String(), ShouldEqual, exp)
-
-				default:
-					p.Debug(tt.str)
-					So(act.String(), ShouldEqual, "")
+			switch {
+			case tt.dbug:
+				p.Debug(tt.str)
+				if act.String() != tt.str+"\n" {
+					t.Fatalf("got %q", act.String())
 				}
-				act.Reset()
-			})
-		}
-	})
+
+			case tt.name == "Info":
+				p.Log.Info(tt.str)
+				if act.String() != tt.str+"\n" {
+					t.Fatalf("got %q", act.String())
+				}
+
+			case tt.name == "Warning":
+				p.Log.Warning(tt.str)
+				if act.String() != tt.str+"\n" {
+					t.Fatalf("got %q", act.String())
+				}
+
+			case tt.name == "Error":
+				p.Log.Error(tt.str)
+				if act.String() != tt.str+"\n" {
+					t.Fatalf("got %q", act.String())
+				}
+
+			default:
+				p.Debug(tt.str)
+				if act.String() != "" {
+					t.Fatalf("want empty, got %q", act.String())
+				}
+			}
+		})
+	}
 }
 
 func TestOption(t *testing.T) {
-	Convey("Testing Option()", t, func() {
-		vanilla := Env{ctr: ctr{RWMutex: &sync.RWMutex{}, stat: make(stat)}}
-		exp := `{
-	"Log": null,
+	vanilla := Env{ctr: ctr{RWMutex: &sync.RWMutex{}, stat: make(stat)}}
+	exp := `{
 	"API": "/bin/cli-shell-api",
 	"Arch": "arm64",
 	"Bash": "/bin/bash",
@@ -96,7 +134,7 @@ func TestOption(t *testing.T) {
 	"Dir": "/tmp",
 	"dnsmasq service": "service dnsmasq restart",
 	"Exc": {},
-	"dnsmasq fileExt.": "blacklist.conf",
+	"dnsmasq fileExt.": "edgeos-adblock.conf",
 	"File": "/config/config.boot",
 	"File name fmt": "%v/%v.%v.%v",
 	"HTTP method": "GET",
@@ -109,60 +147,64 @@ func TestOption(t *testing.T) {
 	}
 }`
 
-		expRaw := Env{
-			ctr:      ctr{RWMutex: &sync.RWMutex{}, stat: make(stat)},
-			API:      "/bin/cli-shell-api",
-			Arch:     "arm64",
-			Bash:     "/bin/bash",
-			Cores:    2,
-			Disabled: false,
-			Dbug:     true,
-			Dex:      &list{entry: entry{}},
-			Dir:      "/tmp",
-			DNSsvc:   "service dnsmasq restart",
-			Exc:      &list{entry: entry{}},
-			Ext:      "blacklist.conf",
-			File:     "/config/config.boot",
-			FnFmt:    "%v/%v.%v.%v",
-			InCLI:    "inSession",
-			Method:   "GET",
-			Pfx:      dnsPfx{domain: "address=", host: "server="},
-			Test:     true,
-			Timeout:  30000000000,
-			Wildcard: Wildcard{Node: "*s", Name: "*"},
-		}
+	expRaw := Env{
+		ctr:      ctr{RWMutex: &sync.RWMutex{}, stat: make(stat)},
+		API:      "/bin/cli-shell-api",
+		Arch:     "arm64",
+		Bash:     "/bin/bash",
+		Cores:    2,
+		Disabled: false,
+		Dbug:     true,
+		Dex:      &list{entry: entry{}},
+		Dir:      "/tmp",
+		DNSsvc:   "service dnsmasq restart",
+		Exc:      &list{entry: entry{}},
+		Ext:      "edgeos-adblock.conf",
+		File:     "/config/config.boot",
+		FnFmt:    "%v/%v.%v.%v",
+		InCLI:    "inSession",
+		Method:   "GET",
+		Pfx:      dnsPfx{domain: "address=", host: "server="},
+		Test:     true,
+		Timeout:  30000000000,
+		Wildcard: Wildcard{Node: "*s", Name: "*"},
+	}
 
-		c := NewConfig()
-		vanilla.Dex = c.Dex
-		vanilla.Exc = c.Exc
-		So(c.Env, ShouldResemble, &vanilla)
+	c := NewConfig()
+	vanilla.Dex = c.Dex
+	vanilla.Exc = c.Exc
+	if !reflect.DeepEqual(c.Env, &vanilla) {
+		t.Fatal("vanilla env mismatch")
+	}
 
-		c = NewConfig(
-			Arch(runtime.GOARCH),
-			API("/bin/cli-shell-api"),
-			Bash("/bin/bash"),
-			Cores(2),
-			Dbug(true),
-			Dir("/tmp"),
-			DNSsvc("service dnsmasq restart"),
-			Ext("blacklist.conf"),
-			File("/config/config.boot"),
-			FileNameFmt("%v/%v.%v.%v"),
-			InCLI("inSession"),
-			Logger(nil),
-			Method("GET"),
-			Prefix("address=", "server="),
-			Test(true),
-			Timeout(30*time.Second),
-			Verb(false),
-			WCard(Wildcard{Node: "*s", Name: "*"}),
-			// Writer(nil),
-		)
+	c = NewConfig(
+		Arch(runtime.GOARCH),
+		API("/bin/cli-shell-api"),
+		Bash("/bin/bash"),
+		Cores(2),
+		Dbug(true),
+		Dir("/tmp"),
+		DNSsvc("service dnsmasq restart"),
+		Ext("edgeos-adblock.conf"),
+		File("/config/config.boot"),
+		FileNameFmt("%v/%v.%v.%v"),
+		InCLI("inSession"),
+		SetLogger(nil),
+		Method("GET"),
+		Prefix("address=", "server="),
+		Test(true),
+		Timeout(30*time.Second),
+		Verb(false),
+		WCard(Wildcard{Node: "*s", Name: "*"}),
+	)
 
-		expRaw.Dex.RWMutex = c.Dex.RWMutex
-		expRaw.Exc.RWMutex = c.Exc.RWMutex
+	expRaw.Dex.RWMutex = c.Dex.RWMutex
+	expRaw.Exc.RWMutex = c.Exc.RWMutex
 
-		So(*c.Env, ShouldResemble, expRaw)
-		So(c.Env.String(), ShouldEqual, exp)
-	})
+	if !reflect.DeepEqual(*c.Env, expRaw) {
+		t.Fatal("expRaw mismatch")
+	}
+	if c.Env.String() != exp {
+		t.Fatalf("JSON mismatch:\n%s", c.Env.String())
+	}
 }

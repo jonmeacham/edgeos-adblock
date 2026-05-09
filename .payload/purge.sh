@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/vbash
 
-# Set up the Vyatta environment
+# Set up the Vyatta environment (see AGENTS.md — transactional CLI only, never raw config files)
 declare -i DEC
 source /opt/vyatta/etc/functions/script-template
 CFGRUN=/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper
@@ -85,8 +85,8 @@ echo_logger() {
 
 # Delete all blacklist configuration files /etc/dnsmasq.d
 clean_dnsmasq() {
-	ls /etc/dnsmasq.d/{domains,hosts}.*.blacklist.conf 1>/dev/null 2>&1 &&
-		try rm -f /etc/dnsmasq.d/{domains,hosts}.*.blacklist.conf
+	ls /etc/dnsmasq.d/{domains,hosts}.*.edgeos-adblock.conf 1>/dev/null 2>&1 &&
+		try rm -f /etc/dnsmasq.d/{domains,hosts}.*.edgeos-adblock.conf
 }
 
 # Delete the [service dns forwarding blacklist] configuration if it exists
@@ -94,10 +94,18 @@ delete_dns_config() {
 	/bin/cli-shell-api existsActive service dns forwarding blacklist
 	if [[ $? == 0 ]]; then
 		try begin
-		try delete system task-scheduler task update_blacklists
+		try delete system task-scheduler task update_edgeos_adblock
 		try delete service dns forwarding blacklist
-		try commit
-		try save
+		try commit || {
+			echo_logger FE "Configuration commit failed — aborting purge"
+			try end 2>/dev/null || true
+			exit 1
+		}
+		try save || {
+			echo_logger FE "Configuration save failed — aborting purge"
+			try end 2>/dev/null || true
+			exit 1
+		}
 		try end
 	fi
 }

@@ -1,0 +1,12 @@
+flag provided but not defined: -z
+Usage of update-dnsmasq:
+  -dir string
+    	Override dnsmasq directory (default "/etc/dnsmasq.d")
+  -f <file>
+    	<file> # Load a config.boot file
+  -h	Display help
+  -safe
+    	Fail over to /config/user-data/edgeos-adblock.failover.cfg
+  -v	Verbose display
+  -version
+    	Show version

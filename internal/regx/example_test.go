@@ -4,16 +4,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/britannic/blacklist/internal/regx"
-
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/jonmeacham/edgeos-adblock/internal/regx"
 )
 
 func TestOBJ(t *testing.T) {
 	rxmap := regx.NewRegex()
-	Convey("Testing regx.Obj", t, func() {
-		act := fmt.Sprint(rxmap)
-		exp := `CMNT: ^(?:[\/*]+)(.*?)(?:[*\/]+)$
+	act := fmt.Sprint(rxmap)
+	exp := `CMNT: ^(?:[\/*]+)(.*?)(?:[*\/]+)$
 DESC: ^(?:description)+\s"?([^"]+)?"?$
 DSBL: ^(?:disabled)+\s([\S]+)$
 FLIP: ^(?:address=[/][.]{0,1}.*[/])(.*)$
@@ -30,6 +27,7 @@ NAME: ^([\w-]+)\s["']{0,1}(.*?)["']{0,1}$
 NODE: ^([\w-]+)\s[{]{1}$
 RBRC: [}]
 SUFX: (?:#.*|\{.*|[/[].*)\z`
-		So(act, ShouldEqual, exp)
-	})
+	if act != exp {
+		t.Errorf("fmt.Sprint(rxmap): mismatch\n got:\n%s\n want:\n%s", act, exp)
+	}
 }

@@ -2,44 +2,42 @@ package edgeos
 
 import (
 	"testing"
-
-	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestArea(t *testing.T) {
-	Convey("Testing area()", t, func() {
-		tests := []struct {
-			exp  string
-			name string
-			s    *source
-		}{
-			{
-				name: roots,
-				s: &source{
-					nType: root,
-				},
-				exp: roots,
+	tests := []struct {
+		exp  string
+		name string
+		s    *source
+	}{
+		{
+			name: roots,
+			s: &source{
+				nType: root,
 			},
-			{
-				name: PreDomns,
-				s: &source{
-					nType: preDomn,
-				},
-				exp: domains,
+			exp: roots,
+		},
+		{
+			name: PreDomns,
+			s: &source{
+				nType: preDomn,
 			},
-			{
-				name: hosts,
-				s: &source{
-					nType: host,
-				},
-				exp: hosts,
+			exp: domains,
+		},
+		{
+			name: hosts,
+			s: &source{
+				nType: host,
 			},
-		}
+			exp: hosts,
+		},
+	}
 
-		for _, tt := range tests {
-			Convey("with "+tt.name, func() {
-				So(tt.s.area(), ShouldEqual, tt.exp)
-			})
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, want := tt.s.area(), tt.exp; got != want {
+				t.Errorf("area(): got %q, want %q", got, want)
+			}
+		})
+	}
 }

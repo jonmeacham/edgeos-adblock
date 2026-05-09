@@ -1,11 +1,10 @@
 package regx_test
 
 import (
+	"reflect"
 	"testing"
 
-	"github.com/britannic/blacklist/internal/regx"
-
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/jonmeacham/edgeos-adblock/internal/regx"
 )
 
 type test struct {
@@ -18,66 +17,73 @@ type config map[regx.Leaf]test
 
 func TestGet(t *testing.T) {
 	o := regx.NewRegex()
-	Convey("Testing Get()", t, func() {
-		for k := range c {
+	for k := range c {
+		k := k
+		t.Run(k.String(), func(t *testing.T) {
 			act := o.SubMatch(k, c[k].input)
-			So(len(act), ShouldBeGreaterThan, 0)
-			So(act[c[k].index], ShouldResemble, c[k].result)
-		}
-	})
+			if len(act) == 0 {
+				t.Fatal("SubMatch: empty result")
+			}
+			if !reflect.DeepEqual(act[c[k].index], c[k].result) {
+				t.Errorf("SubMatch index %d: got %q, want %q", c[k].index, act[c[k].index], c[k].result)
+			}
+		})
+	}
 }
 
 func TestLeafString(t *testing.T) {
-	Convey("Testing LeafString()", t, func() {
-		var i regx.Leaf = 1000
-		So(i.String(), ShouldEqual, "CMNT")
-	})
+	var i regx.Leaf = 1000
+	if got, want := i.String(), "CMNT"; got != want {
+		t.Errorf("String(): got %q, want %q", got, want)
+	}
 }
 
 func TestStripPrefixAndSuffix(t *testing.T) {
-	Convey("Testing StripPrefixAndSuffix()", t, func() {
-		tests := []struct {
-			exp    []byte
-			line   []byte
-			ok     bool
-			prefix string
-			rx     *regx.OBJ
-		}{
-			{
-				exp:    []byte("This is a complete sentence and should not be a comment."),
-				line:   []byte("/* This is a complete sentence and should not be a comment."),
-				ok:     true,
-				prefix: "/* ",
-				rx:     regx.NewRegex(),
-			},
-			{
-				exp:    []byte("verybad.phishing.sites.r.us.com"),
-				line:   []byte("https://verybad.phishing.sites.r.us.com"),
-				ok:     true,
-				prefix: "https://",
-				rx:     regx.NewRegex(),
-			},
-			{
-				exp:    []byte("verybad.phishing.sites.r.us.com"),
-				line:   []byte("https://verybad.phishing.sites.r.us.com"),
-				ok:     true,
-				prefix: "http",
-				rx:     regx.NewRegex(),
-			},
-			{
-				exp:    []byte("verybad.phishing.sites.r.us.com"),
-				line:   []byte("verybad.phishing.sites.r.us.com"),
-				ok:     false,
-				prefix: "http",
-				rx:     regx.NewRegex(),
-			},
+	tests := []struct {
+		exp    []byte
+		line   []byte
+		ok     bool
+		prefix string
+		rx     *regx.OBJ
+	}{
+		{
+			exp:    []byte("This is a complete sentence and should not be a comment."),
+			line:   []byte("/* This is a complete sentence and should not be a comment."),
+			ok:     true,
+			prefix: "/* ",
+			rx:     regx.NewRegex(),
+		},
+		{
+			exp:    []byte("verybad.phishing.sites.r.us.com"),
+			line:   []byte("https://verybad.phishing.sites.r.us.com"),
+			ok:     true,
+			prefix: "https://",
+			rx:     regx.NewRegex(),
+		},
+		{
+			exp:    []byte("verybad.phishing.sites.r.us.com"),
+			line:   []byte("https://verybad.phishing.sites.r.us.com"),
+			ok:     true,
+			prefix: "http",
+			rx:     regx.NewRegex(),
+		},
+		{
+			exp:    []byte("verybad.phishing.sites.r.us.com"),
+			line:   []byte("verybad.phishing.sites.r.us.com"),
+			ok:     false,
+			prefix: "http",
+			rx:     regx.NewRegex(),
+		},
+	}
+	for _, tt := range tests {
+		act, ok := tt.rx.StripPrefixAndSuffix(tt.line, tt.prefix)
+		if !reflect.DeepEqual(act, tt.exp) {
+			t.Errorf("StripPrefixAndSuffix: got %q, want %q", act, tt.exp)
 		}
-		for _, tt := range tests {
-			act, ok := tt.rx.StripPrefixAndSuffix(tt.line, tt.prefix)
-			So(act, ShouldResemble, tt.exp)
-			So(ok, ShouldEqual, tt.ok)
+		if ok != tt.ok {
+			t.Errorf("StripPrefixAndSuffix ok: got %v, want %v", ok, tt.ok)
 		}
-	})
+	}
 }
 
 var c = config{

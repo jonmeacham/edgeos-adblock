@@ -14,7 +14,7 @@ type Leaf int
 
 // Leaf label regx map keys
 //
-//ggo:generate go run golang.org/x/tools/cmd/stringer -type=Leaf
+//go:generate go run golang.org/x/tools/cmd/stringer -type=Leaf
 const (
 	CMNT Leaf = iota + 1000
 	DESC
