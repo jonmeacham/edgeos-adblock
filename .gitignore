@@ -40,6 +40,11 @@ vendor/
 *.deb
 /coverage.txt
 /edgeos-adblock
+
+# Build outputs and local tooling dirs (not committed)
+/dist/
+/bin/
+/build/
 /profile001.gif
 /profile001.png
 /testcoverage

@@ -66,6 +66,9 @@ func TestMain(t *testing.T) {
 	if os.Geteuid() != 0 {
 		t.Skip("requires root (production parity)")
 	}
+	if _, err := os.Stat("/etc/init.d/dnsmasq"); err != nil {
+		t.Skip("requires EdgeOS-style dnsmasq init at /etc/init.d/dnsmasq")
+	}
 	origArgs := os.Args
 	prog := path.Base(os.Args[0])
 	prfx := fmt.Sprintf("%s: ", prog)

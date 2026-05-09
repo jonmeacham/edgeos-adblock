@@ -1,0 +1,19 @@
+# syntax=docker/dockerfile:1
+# Dev image: Go (test/build) + Ruby fpm (.deb packaging). Host only needs Docker + make.
+# Keep ARG in sync with go.mod / Makefile GO_VERSION.
+ARG GO_VERSION=1.26
+
+FROM golang:${GO_VERSION}-bookworm
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		git \
+		ca-certificates \
+		ruby \
+		ruby-dev \
+		build-essential \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& gem install --no-document fpm
+
+ENV GOTOOLCHAIN=auto
+WORKDIR /src

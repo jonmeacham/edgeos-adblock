@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Verifies docs/makefile-conventions.md: .DEFAULT_GOAL := help and canonical ##@ order.
+# Verifies Makefile: .DEFAULT_GOAL := help and ordered ##@ headers for this repo.
 # Compatible with bash 3.2 (macOS).
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -10,7 +10,7 @@ grep -q '^\.DEFAULT_GOAL := help' "$MF" || {
   exit 1
 }
 
-expected=(Setup Build Quality Test Coverage CI Run Refresh Deploy Clean)
+expected=(Setup Build Test Clean)
 tmp=$(mktemp)
 grep '^##@' "$MF" | sed 's/^##@[[:space:]]*//' >"$tmp"
 count=$(wc -l <"$tmp" | tr -d ' ')

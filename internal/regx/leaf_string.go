@@ -32,9 +32,9 @@ const _Leaf_name = "CMNTDESCDSBLFLIPFQDNHOSTHTTPIPBHLEAFLBRCMISCMLTIMPTYNAMENODE
 var _Leaf_index = [...]uint8{0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68}
 
 func (i Leaf) String() string {
-	i -= 1000
-	if i < 0 || i >= Leaf(len(_Leaf_index)-1) {
-		return "Leaf(" + strconv.FormatInt(int64(i+1000), 10) + ")"
+	idx := int(i) - 1000
+	if i < 1000 || idx >= len(_Leaf_index)-1 {
+		return "Leaf(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _Leaf_name[_Leaf_index[i]:_Leaf_index[i+1]]
+	return _Leaf_name[_Leaf_index[idx]:_Leaf_index[idx+1]]
 }

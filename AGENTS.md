@@ -12,6 +12,10 @@ Cron helpers that only sleep and invoke `/config/scripts/update-dnsmasq` do not 
 
 This fork names the periodic task **`update_edgeos_adblock`** (under `system task-scheduler task`) and generates dnsmasq includes matching `*.edgeos-adblock.conf`. The Vyatta service node remains **`service dns forwarding blocklist`**—that is the EdgeOS CLI subtree installed by the package and must not be renamed in automation.
 
+### Documentation
+
+Prefer documentation that explains stable behavior users depend on (how to run, configure, cache, override, clean). Avoid documenting transient symptoms (exact log lines, one-off toolchain warnings, internal flags) unless they are part of the public contract.
+
 ---
 
 ## 1. Scope

@@ -25,8 +25,9 @@ const _ntype_name = "unknowndomnexcDomnexcHostexcRoothostpreDomnpreHostpreRootro
 var _ntype_index = [...]uint8{0, 7, 11, 18, 25, 32, 36, 43, 50, 57, 61}
 
 func (i ntype) String() string {
-	if i < 0 || i >= ntype(len(_ntype_index)-1) {
+	idx := int(i) - 0
+	if i < 0 || idx >= len(_ntype_index)-1 {
 		return "ntype(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
-	return _ntype_name[_ntype_index[i]:_ntype_index[i+1]]
+	return _ntype_name[_ntype_index[idx]:_ntype_index[idx+1]]
 }

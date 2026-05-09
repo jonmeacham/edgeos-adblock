@@ -69,8 +69,11 @@ func TestPurgeFiles(t *testing.T) {
 	if err := purgeFiles(purgeList); err != nil {
 		t.Fatal(err)
 	}
-	if err := purgeFiles([]string{"/dev/null"}); err == nil {
-		t.Fatal("purgeFiles(/dev/null): expected error")
+	// As root (e.g. default golang Docker), unlink("/dev/null") may succeed; only assert when non-root.
+	if os.Geteuid() != 0 {
+		if err := purgeFiles([]string{"/dev/null"}); err == nil {
+			t.Fatal("purgeFiles(/dev/null): expected error")
+		}
 	}
 	if err := purgeFiles([]string{"SpiegelAdlerIstHier"}); err != nil {
 		t.Fatal(err)

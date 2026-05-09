@@ -2,6 +2,8 @@
 
 export COPY_EXTENDED_ATTRIBUTES_DISABLE=true
 export COPYFILE_DISABLE=true
+# Do not pass GZIP through to child tar/gzip (packaging).
+unset GZIP
 drop="$HOME/Dropbox/EdgeOS"
 arch=${2}
 dep=''
@@ -28,7 +30,7 @@ src2='config/'
 scripts="${sdir}/${src2}/scripts"
 url='https://github.com/jonmeacham/edgeos-adblock'
 vend='Helm Rock Consulting'
-ver=$(git describe --tags --always --dirty 2>/dev/null || echo 0.0.0-dev)
+ver="${VER:-$(git rev-parse --short HEAD 2>/dev/null || echo unknown)}"
 deb="${pkg}_${ver}_${arch}.${dist}"
 
 bundle() {
@@ -57,6 +59,7 @@ bundle() {
 make_debian() {
 	fpm \
 		-f \
+		--log error \
 		--description "${desc}" \
 		--license "${lic}" \
 		--after-install "${postinst}" \
@@ -65,7 +68,6 @@ make_debian() {
 		--provides "${prov}" \
 		--url "${url}" \
 		--vendor "${vend}" \
-		--verbose \
 		-a "${arch}" \
 		-C "${sdir}" \
 		-m "${mntr}" \
@@ -78,7 +80,7 @@ make_debian() {
 }
 
 compress_deb() {
-	tar -zcvf "${deb}.tgz" "${deb}"
+	tar -zcf "${deb}.tgz" "${deb}"
 }
 
 update_dropbox() {

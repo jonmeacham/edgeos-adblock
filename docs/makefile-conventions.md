@@ -83,12 +83,12 @@ If a project has nothing to do in a category, include it anyway with at least on
 
 ## Guard
 
-Scripts/check-makefile-conventions.sh validates `.DEFAULT_GOAL` and category header order. Run `make guard-makefile` or `make ci`.
+`scripts/check-makefile-conventions.sh` validates `.DEFAULT_GOAL := help` and the ordered `##@` headers expected for that repository. In **edgeos-adblock** the guard expects **Setup → Build → Test → Clean** (Docker-only slim Makefile). Run **`make guard-makefile`**.
 
 ## Quick adoption checklist
 
-1. Copy `scripts/check-makefile-conventions.sh` (or adapt to your test framework).
-2. Rewrite the `Makefile` per the skeleton and categories above.
+1. Copy `scripts/check-makefile-conventions.sh` (or adapt category list inside it).
+2. Rewrite the `Makefile` per the skeleton and categories above (or your chosen subset, and align the guard script).
 3. Run the guard; iterate until green.
-4. Invoke `make ci` from your CI runner or hooks (no vendor-specific workflow required).
+4. Invoke your CI entrypoint (`make test`, `make ci`, etc.) from your runner or hooks.
 5. Reference this doc from the project's contributor docs.

@@ -24,7 +24,7 @@ Run **`update-dnsmasq -h`** for current flags. Common options: **`-f`** (config)
 
 ## Build and install
 
-- **Develop and build from source:** **[docs/build-and-test.md](docs/build-and-test.md)** (`make help`, **`make ci`**, **`make build-local`**, **`make docker-build`**).
+- **Develop and build from source:** **[docs/build-and-test.md](docs/build-and-test.md)** (`make help`, **`make test`**, **`make build`**, **`make pkgs`** in Docker; **`docker build`** for the slim runtime image).
 - **Package layout:** the CLI lives under **`cmd/update-dnsmasq/`**; shared libraries under **`internal/`**. Debian packaging helpers include **`make_deb`** and **`Dockerfile`** as documented there.
 - **Router install:** use your usual packaging or artifact workflow; **`.payload/post-install.sh`** illustrates CLI commands that provision blocklist sources and a periodic **`update-dnsmasq`** task. **`config.gateway.json`** is a UniFi **`config.gateway.json`** example for USG-style provisioning.
 

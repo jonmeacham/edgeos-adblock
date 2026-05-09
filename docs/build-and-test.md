@@ -1,61 +1,45 @@
 # Build and test
 
-Use the Makefile as the canonical interface (`make help`). **There is no `vendor/` directory** — modules are fetched into the cache (`go mod download`), or you build inside Docker for a fully pinned environment. The installable command is **`./cmd/update-dnsmasq`** (import path **`github.com/jonmeacham/edgeos-adblock/cmd/update-dnsmasq`**, `package main`).
+The **Makefile** is the canonical interface (`make help`). **Go runs only inside Docker** — the host needs **Docker** and **GNU make** (no local Go toolchain).
 
-## Docker (preferred for Linux binaries)
+## Dev image (`Dockerfile.dev`)
 
-From the repo root:
+`make test` and `make build` use **`edgeos-adblock-dev:latest`** (override with **`DEV_IMAGE=...`**). The image is built from **`Dockerfile.dev`**; keep **`GO_VERSION`** in sync with **`go.mod`** / **`toolchain`**.
 
-```bash
-docker build -t edgeos-adblock:local .
-# or
-make docker-build
-```
-
-The **`Dockerfile`** uses **`golang:<version>-bookworm`** to **`go build`** (modules downloaded inside the layer cache), then installs the binary into **`debian:bookworm-slim`** with CA certificates. Tests are **not** run in the image by default (they expect EdgeOS-style paths and syslog); use **`make ci`** on a dev machine or your CI runner for **`go test`**. Adjust **`ARG GO_VERSION`** to match **`go.mod`** / **`toolchain`**.
-
-Override image name:
-
-```bash
-docker build -t my-registry/edgeos-adblock:latest .
-```
-
-## Everyday development (host)
+The Makefile mounts a **Docker named volume** (default **`edgeos-adblock-go-cache`**) for **`GOMODCACHE`** and **`GOCACHE`**, so incremental builds reuse the Go module and build caches across container runs. Set **`GO_CACHE_VOLUME`** to use a different volume name; **`docker volume rm edgeos-adblock-go-cache`** clears the cache for a fully cold build.
 
 | Command | Purpose |
 |--------|---------|
-| `make install` | `go mod download`, `verify`, `tidy`; install `golangci-lint` into `$(go env GOPATH)/bin` if missing. |
-| `make test` | `go test ./...` (135s timeout). Use `make test TEST_FLAGS=-count=1` to bypass test cache. |
-| `make build-local` | Build `update-dnsmasq` from **`cmd/update-dnsmasq`** for your OS/arch (`-mod=readonly`). Does **not** run `go generate`; keep committed stringer output in sync when enums change. |
-| `make fmt` / `make format-check` | Apply `gofmt` or fail if formatting drifts. |
+| `make docker-image` | Build or rebuild the dev image. |
+| `make test` | `go mod download` then `go test ./...` inside the container (`TEST_FLAGS`, `TEST_TIMEOUT` optional). |
+| `make build` | Builds **both** router binaries in Docker: **`dist/update-dnsmasq.mips`** (`linux/mips64`, ER-Lite class) and **`dist/update-dnsmasq.mipsel`** (`linux/mipsle`, ER-X class). Same names as the legacy packaging flow. |
+| `make build-mips64` | **`linux/mips64`** only → **`dist/update-dnsmasq.mips`**. Optional **`GOMIPS64=softfloat`**. |
+| `make build-mipsle` | **`linux/mipsle`** only → **`dist/update-dnsmasq.mipsel`**. Default **`MIPSLE_GOMIPS=softfloat`**; override with **`MIPSLE_GOMIPS=hardfloat`** or empty. |
+| `make pkgs` | Builds **both** `.deb` packages (`make pkg-mips` + `make pkg-mipsel`). Installs the matching **`update-dnsmasq`** under **`/config/scripts/`**, ships Vyatta templates under **`/opt/vyatta/...`**, and on **first install** runs **`.payload/post-install.sh`** (Vyatta `configure` session) to enable **`service dns forwarding blocklist`** sources, excludes, cron, etc. Output: **`dist/edgeos-adblock_<ver>_mips.deb`** and **`_mipsel.deb`** (plus optional **`.tgz`** archives). |
+| `make pkg-mips` / `make pkg-mipsel` | Build a single-arch `.deb` after the matching **`build-mips*`** binary exists. |
+| `make clean` | Remove **`dist/`**, cross-build `update-dnsmasq.*` artefacts, and common test outputs. |
+| `make guard-makefile` | Run **`scripts/check-makefile-conventions.sh`**. |
 
-## Merge / pipeline gate (host)
+Example:
 
-Run **`make ci`** (same as **`make verify`**):
+```bash
+make test TEST_FLAGS=-count=1
+make build
+make pkgs   # .deb files in dist/
+```
 
-1. `guard-makefile`
-2. `install`
-3. `format-check`, `vet`, `lint`
-4. `test` with **`TEST_FLAGS=-count=1`**
-5. `build-ci` — host compile check → `$(DISTDIR)/edgeos-adblock.ci` (default `/tmp`)
-6. `build-cross-mipsle` — linux/mipsle cross-compile (no `go generate`)
+Some integration tests require **root** and an EdgeOS-style **`/etc/init.d/dnsmasq`**; those are skipped automatically in the dev container and on typical workstations.
 
-For **reproducible** Linux builds and tests in CI, run **`docker build`** (or your own image that mirrors the Dockerfile) instead of relying on the host toolchain.
+## Runtime image (`Dockerfile`)
 
-## Targets that modify files
+Shippable OCI image (Debian slim runtime, `CGO_ENABLED=0` build in the multi-stage **`Dockerfile`**):
 
-- **`make check`** / **`make tests`** run **`fmt`** then **`install`** (module tidy/download) then tests — they can rewrite sources. Prefer **`make test`** for read-only validation.
+```bash
+docker build -t edgeos-adblock:local .
+```
 
-## Coverage and extras
-
-- **`make test-coverage`** — merged HTML/XML coverage (optional gocov tools under `$(BIN)/`).
-- **`make generate`** — stringer via `go generate`; needs a matching **`golang.org/x/tools`** in the module graph (use the same Go version as **`go.mod` `toolchain`**).
-- **`make mipsle`**, **`make build`**, **`make pkgs`** — full release / `.deb` paths (still use **make** for EdgeOS packages; use **Docker** when you want a clean module-only build for Linux).
-
-## Router install (EdgeOS)
-
-Install the **`edgeos-adblock`** `.deb` for your router CPU, or use **`make_deb`** / your release pipeline. Vyatta templates live under **`.payload/`**; **`post-install.sh`** seeds blocklist sources and schedules **`update-dnsmasq`**. For UniFi **`config.gateway.json`** provisioning, see the sample at the repo root.
+Adjust **`ARG GO_VERSION`** in **`Dockerfile`** to match **`go.mod`**.
 
 ## Contract
 
-Anything you remove from the tree should still allow **`make ci`** (host) and/or a successful **`docker build`** (container), depending on which path you support in your infrastructure.
+Changes should keep **`make guard-makefile`**, **`make test`**, **`make build`**, and **`make pkgs`** succeeding from a clean clone with only Docker + make installed.
