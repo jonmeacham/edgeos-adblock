@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Makefile conventions
+        run: make guard-makefile
+
+      - name: Unit tests (dev image)
+        run: make test
+
+      - name: E2E parity tests (root + dnsmasq image)
+        run: make test-e2e

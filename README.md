@@ -24,9 +24,9 @@ Example snippets and the **`Live`** test fixture use the same **[HaGeZi DNS Bloc
 
 Contributors need **Docker** and **GNU make** only; Go runs inside the dev image. **`make help`** lists every target.
 
-End-to-end workflow, artifact locations, cache behavior, and supported **make** variables are described in **[docs/build-and-test.md](docs/build-and-test.md)**.
+End-to-end workflow, artifact locations, cache behavior, **`make test-e2e`** (Docker harness with dnsmasq), and supported **make** variables are described in **[docs/build-and-test.md](docs/build-and-test.md)**.
 
-Layout: **`cmd/update-dnsmasq/`** (CLI entrypoint), **`internal/`** (libraries), **`.payload/`** (templates and maintainer scripts), **`make_deb`** and **`Dockerfile`** / **`Dockerfile.dev`** (packaging and images).
+Layout: **`cmd/update-dnsmasq/`** (CLI entrypoint), **`internal/`** (libraries), **`.payload/`** (templates and maintainer scripts), **`make_deb`**, **`Dockerfile.dev`** (dev/build), and **`Dockerfile.e2e`** (root + dnsmasq parity tests).
 
 ## Installing on hardware
 

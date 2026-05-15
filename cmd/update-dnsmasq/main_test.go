@@ -85,11 +85,13 @@ func TestMain(t *testing.T) {
 
 	screenLog(prfx)
 	main()
-	if act == "" {
-		t.Error("expected logFatalf to run")
-	}
 	if actReloadDNS == "" {
 		t.Error("expected reload log")
+	}
+	// When outbound connectivity works, main does not call logFatalf for ChkWeb; the mocked logFatalf
+	// does not exit, so reload still runs. When offline, logFatalf records the abort message first.
+	if act == "" && !e.ChkWeb("www.google.com", 443) {
+		t.Error("expected logFatalf when outbound connectivity is unavailable")
 	}
 
 	t.Run("config file load", func(t *testing.T) {

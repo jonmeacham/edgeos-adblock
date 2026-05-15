@@ -1,0 +1,16 @@
+# syntax=docker/dockerfile:1
+# E2E harness: Go (native amd64 tests/builds) + dnsmasq with SysV-style init script.
+# Enables production-parity tests that require root and /etc/init.d/dnsmasq.
+# Keep GO_VERSION in sync with go.mod / Makefile.
+ARG GO_VERSION=1.26
+
+FROM golang:${GO_VERSION}-bookworm
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		dnsmasq \
+		ca-certificates \
+	&& rm -rf /var/lib/apt/lists/*
+
+ENV GOTOOLCHAIN=auto
+WORKDIR /src
