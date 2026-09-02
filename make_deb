@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+arch=${1:?usage: make_deb <mips|mipsel>}
+case "${arch}" in
+	mips|mipsel) ;;
+	*)
+		echo "unsupported Debian architecture: ${arch}" >&2
+		exit 2
+		;;
+esac
+
+pkg=edgeos-adblock
+ver=${VER:-0.0.0}
+stage=$(mktemp -d)
+output="${pkg}_${ver}_${arch}.deb"
+trap 'rm -rf "${stage}"' EXIT
+
+chmod 0755 "${stage}"
+mkdir -p "${stage}/DEBIAN"
+cp -a .payload/opt "${stage}/"
+cp -a .payload/config "${stage}/"
+install -m0755 .payload/post-install.sh "${stage}/DEBIAN/postinst"
+install -m0755 .payload/pre-remove.sh "${stage}/DEBIAN/prerm"
+
+{
+	printf 'Package: %s\n' "${pkg}"
+	printf 'Version: %s\n' "${ver}"
+	printf 'Section: net\n'
+	printf 'Priority: optional\n'
+	printf 'Architecture: %s\n' "${arch}"
+	printf 'Maintainer: Jon Meacham\n'
+	printf 'Provides: %s\n' "${pkg}"
+	printf 'Homepage: https://github.com/jonmeacham/edgeos-adblock\n'
+	printf 'License: MIT\n'
+	printf 'Vendor: Jon Meacham\n'
+	printf 'Description: EdgeOS DNS forwarding adblock updater\n'
+} >"${stage}/DEBIAN/control"
+
+(
+	cd "${stage}"
+	find config opt -type f -print0 | sort -z | xargs -0 md5sum >DEBIAN/md5sums
+)
+
+dpkg-deb -Zgzip --build --root-owner-group "${stage}" "${output}"

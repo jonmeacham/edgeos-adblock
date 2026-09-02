@@ -1,0 +1,8 @@
+type: txt
+help: URL of a plain-text adblock source
+
+syntax:expression: pattern $VAR(@) "^https?://[^![:space:]]+$" ; "URL must use HTTP or HTTPS and must not contain spaces or '!'"
+
+val_help: http; Example: https://example.invalid/adblock.txt
+comp_help: Use a URL that returns plain text
+commit:expression: $VAR(../file) == ""; "file and url are mutually exclusive, only set one or the other as a source."

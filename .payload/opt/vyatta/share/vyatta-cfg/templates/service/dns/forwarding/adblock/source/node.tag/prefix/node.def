@@ -1,0 +1,3 @@
+type: txt
+help: Exact prefix required and removed before extracting domains from ordinary lines
+val_help: prefix; Example: "0.0.0.0 " for a hosts-style line

@@ -1,0 +1,175 @@
+package regx_test
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/jonmeacham/edgeos-adblock/internal/regx"
+)
+
+type test struct {
+	index  int
+	input  []byte
+	result []byte
+}
+
+type config map[regx.Leaf]test
+
+func TestGet(t *testing.T) {
+	o := regx.NewRegex()
+	for k := range c {
+		k := k
+		t.Run(k.String(), func(t *testing.T) {
+			act := o.SubMatch(k, c[k].input)
+			if len(act) == 0 {
+				t.Fatal("SubMatch: empty result")
+			}
+			if !reflect.DeepEqual(act[c[k].index], c[k].result) {
+				t.Errorf("SubMatch index %d: got %q, want %q", c[k].index, act[c[k].index], c[k].result)
+			}
+		})
+	}
+}
+
+func TestLeafString(t *testing.T) {
+	var i regx.Leaf = 1000
+	if got, want := i.String(), "CMNT"; got != want {
+		t.Errorf("String(): got %q, want %q", got, want)
+	}
+}
+
+func TestStripPrefixAndSuffix(t *testing.T) {
+	tests := []struct {
+		exp    []byte
+		line   []byte
+		ok     bool
+		prefix string
+		rx     *regx.OBJ
+	}{
+		{
+			exp:    []byte("This is a complete sentence and should not be a comment."),
+			line:   []byte("/* This is a complete sentence and should not be a comment."),
+			ok:     true,
+			prefix: "/* ",
+			rx:     regx.NewRegex(),
+		},
+		{
+			exp:    []byte("verybad.phishing.sites.r.us.com"),
+			line:   []byte("https://verybad.phishing.sites.r.us.com"),
+			ok:     true,
+			prefix: "https://",
+			rx:     regx.NewRegex(),
+		},
+		{
+			exp:    []byte("verybad.phishing.sites.r.us.com"),
+			line:   []byte("https://verybad.phishing.sites.r.us.com"),
+			ok:     true,
+			prefix: "http",
+			rx:     regx.NewRegex(),
+		},
+		{
+			exp:    []byte("verybad.phishing.sites.r.us.com"),
+			line:   []byte("verybad.phishing.sites.r.us.com"),
+			ok:     false,
+			prefix: "http",
+			rx:     regx.NewRegex(),
+		},
+	}
+	for _, tt := range tests {
+		act, ok := tt.rx.StripPrefixAndSuffix(tt.line, tt.prefix)
+		if !reflect.DeepEqual(act, tt.exp) {
+			t.Errorf("StripPrefixAndSuffix: got %q, want %q", act, tt.exp)
+		}
+		if ok != tt.ok {
+			t.Errorf("StripPrefixAndSuffix ok: got %v, want %v", ok, tt.ok)
+		}
+	}
+}
+
+var c = config{
+	regx.CMNT: test{
+		index:  1,
+		input:  []byte(`/*Comment*/`),
+		result: []byte(`Comment`),
+	},
+	regx.DESC: test{
+		index:  1,
+		input:  []byte(`description "Descriptive text"`),
+		result: []byte(`Descriptive text`),
+	},
+	regx.DSBL: test{
+		index:  1,
+		input:  []byte(`disabled false`),
+		result: []byte(`false`),
+	},
+	regx.FLIP: test{
+		index:  1,
+		input:  []byte(`address=/.xunlei.com/0.0.0.0`),
+		result: []byte(`0.0.0.0`),
+	},
+	regx.FQDN: test{
+		index:  1,
+		input:  []byte(`http:/123pagerank.com/*=UUID:272`),
+		result: []byte(`123pagerank.com`),
+	},
+	regx.HOST: test{
+		index:  1,
+		input:  []byte(`address=/.xunlei.com/0.0.0.0`),
+		result: []byte(`xunlei.com`),
+	},
+	regx.HTTP: test{
+		index:  1,
+		input:  []byte(`https:/123pagerank.com/*=UUID:272`),
+		result: []byte(`123pagerank.com/*=UUID:272`),
+	},
+	regx.IPBH: test{
+		index:  1,
+		input:  []byte(`dns-redirect-ip 0.0.0.0`),
+		result: []byte(`0.0.0.0`),
+	},
+	regx.LBRC: test{
+		index:  0,
+		input:  []byte(`adblock {`),
+		result: []byte(`{`),
+	},
+	regx.LEAF: test{
+		index:  1,
+		input:  []byte(`source volkerschatz {`),
+		result: []byte(`source`),
+	},
+	regx.MISC: test{
+		index:  0,
+		input:  []byte(`adblock-bigot`),
+		result: []byte(`adblock-bigot`),
+	},
+	regx.MLTI: test{
+		index:  2,
+		input:  []byte(`block adsrvr.org`),
+		result: []byte(`adsrvr.org`),
+	},
+	regx.MPTY: test{
+		index:  0,
+		input:  []byte{},
+		result: []byte{},
+	},
+	regx.NAME: test{
+		index:  1,
+		input:  []byte(`Test "System"`),
+		result: []byte(`Test`),
+	},
+	regx.NODE: test{
+		index:  1,
+		input:  []byte(`adblock {`),
+		result: []byte(`adblock`),
+	},
+	regx.RBRC: test{
+		index:  0,
+		input:  []byte(`} adblock`),
+		result: []byte(`}`),
+	},
+	regx.SUFX: test{
+		index:  0,
+		input:  []byte(`www.123pagerank.com/*=UUID`),
+		result: []byte(`/*=UUID`),
+	},
+}

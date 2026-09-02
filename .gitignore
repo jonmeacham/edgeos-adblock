@@ -1,0 +1,35 @@
+.DS_Store
+.idea/
+.vscode/
+
+# Build outputs
+/bin/
+/build/
+/dist/
+/.payload/config/scripts/edgeos-adblock
+/edgeos-adblock
+/edgeos-adblock_*.deb
+*.amd64
+*.mips
+*.mipsel
+*.test
+
+# Test, coverage, and profiling output
+*.cover
+*.cov
+*.coverprofile
+*.out
+*.prof
+*.pprof
+/coverage.txt
+/profile001.gif
+/profile001.png
+/testcoverage
+
+# Local editor and dependency files
+*.bak
+*.bkp
+*.lock
+*.log
+*.VC.db
+/vendor/

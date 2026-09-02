@@ -1,0 +1,6 @@
+multi:
+type: txt
+help: Domain and descendants to exclude from generated adblock rules
+
+syntax:expression: pattern $VAR(@) "^([[:alnum:]]([[:alnum:]-]*[[:alnum:]])?\\.)+[[:alpha:]]{2,63}$"
+                   ; "invalid fully qualified domain name $VAR(@)"

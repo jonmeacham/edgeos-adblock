@@ -1,0 +1,8 @@
+type: txt
+syntax:expression: exec
+    "if [ ! -r \"$VAR(@)\" ]; then \
+        echo \"File $VAR(@) does not exist or is not readable\"; \
+        exit 1; \
+    fi; "
+commit:expression: $VAR(../url) == ""; "file and url are mutually exclusive, only set one or the other as a source."
+help: Path to a readable local plain-text adblock source

@@ -1,0 +1,11 @@
+tag:
+type: txt
+help: Adblock source name
+
+comp_help: Type a unique name using letters, numbers, underscores, or hyphens
+
+syntax:expression: pattern $VAR(@) "^[[:alnum:]][_[:alnum:]-]*$"; \
+"Source names may contain only letters, numbers, underscores, and hyphens"
+
+commit:expression: ($VAR(./url) == "" && $VAR(./file) != "") || ($VAR(./url) != "" && $VAR(./file) == ""); \
+"A source must set exactly one of url or file"

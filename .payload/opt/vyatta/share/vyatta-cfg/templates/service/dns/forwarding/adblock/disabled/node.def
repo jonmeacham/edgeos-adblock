@@ -1,0 +1,11 @@
+type: bool
+default: false
+
+syntax:expression: $VAR(@) in true, false; "Must be true or false!"
+
+help: Disable adblock processing and remove generated rules
+
+val_help: true; Disable adblock processing
+val_help: false; Enable adblock processing
+
+commit:expression: $VAR(@) in true, false; "Must be true or false!"
